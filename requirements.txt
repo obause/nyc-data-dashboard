@@ -12,3 +12,7 @@ nbformat==5.8.0
 # Geodaten
 shapely==2.0.1
 geopandas==0.12.2
+
+# Caching
+flask-caching==2.0.2
+redis==4.5.5
