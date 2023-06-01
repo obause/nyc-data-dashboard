@@ -68,12 +68,33 @@ fig_life = px.scatter(df_life, x="gdp per capita", y="life expectancy",
                  log_x=True, size_max=60)
 
 
-df_radar = pd.DataFrame({
-    "r": [1, 5, 2, 2, 3],
-    "theta": ['processing cost','mechanical properties','chemical stability',
-           'thermal stability', 'device integration']})
-fig_radar = px.line_polar(df_radar, r='r', theta='theta', line_close=True)
+categories = ['Crime Rate', 'Poverty', 'Education', 'Traffic', 'Housing']
 
+fig_radar = go.Figure()
+
+fig_radar.add_trace(go.Scatterpolar(
+      r=[
+        0.243243, 1, 2, 2, 3
+      ],
+      theta=categories,
+      fill='toself',
+      name='Bronx'
+))
+fig_radar.add_trace(go.Scatterpolar(
+      r=[4, 3, 2.5, 1, 2],
+      theta=categories,
+      fill='toself',
+      name='Brooklyn'
+))
+
+fig_radar.update_layout(
+  polar=dict(
+    radialaxis=dict(
+      visible=True,
+      range=[0, 5]
+    )),
+  showlegend=True
+)
 
 markdown_text = '''
 ### Dash and Markdown
