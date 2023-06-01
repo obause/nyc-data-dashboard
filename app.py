@@ -68,6 +68,13 @@ fig_life = px.scatter(df_life, x="gdp per capita", y="life expectancy",
                  log_x=True, size_max=60)
 
 
+df_radar = pd.DataFrame({
+    "r": [1, 5, 2, 2, 3],
+    "theta": ['processing cost','mechanical properties','chemical stability',
+           'thermal stability', 'device integration']})
+fig_radar = px.line_polar(df_radar, r='r', theta='theta', line_close=True)
+
+
 markdown_text = '''
 ### Dash and Markdown
 
@@ -122,8 +129,8 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
 
     
     dcc.Graph(
-        id='example-graph-2',
-        figure=fig
+        id='radar-chart',
+        figure=fig_radar
     ),
     
     html.Div(children='Dash: A web application framework for your data.', style={
