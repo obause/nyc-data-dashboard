@@ -3,6 +3,7 @@ import copy
 import time
 import datetime
 import json
+import logging
 
 from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
@@ -12,6 +13,11 @@ import pandas as pd
 
 import plotly.express as px
 import plotly.graph_objects as go
+
+from data_preprocessing import *
+
+
+logger = logging.getLogger(__name__)
 
 # Static configuration
 external_stylesheets = [
@@ -38,41 +44,21 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 #server = app.server
 
-# Data loading and preprocessing
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
-
-df_exports = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
-
-df_life = pd.read_csv('https://gist.githubusercontent.com/chriddyp/5d1ea79569ed194d432e56108a04d188/raw/a9f9e8076b837d541398e999dcbac2b2826a81f8/gdp-life-exp-2007.csv')
-
-borough_mapping = pd.DataFrame({
-    "borough_name": ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"],
-    "boro_code": [1, 2, 3, 4, 5],
-    "boro_short1": ["M", "X", "B", "Q", "R"],
-    "boro_short2": ["M", "B", "K", "Q", "S"],
-    "lat": [40.776676,40.837048,40.650002,40.742054,40.579021],
-    "lon": [-73.971321,-73.865433,-73.949997,-73.769417, -74.151535]
-})
-
-with open('data/Parks_Properties.geojson') as f:
-    nycParksGeo = json.load(f)
-
-nypd_arrests_2022 = pd.read_csv('data/crime/arrests_2022.csv')
-date = nypd_arrests_2022['ARREST_DATE'].str.split("/", n = 3, expand = True)
-nypd_arrests_2022['year'] = date[2].astype('int32')
-nypd_arrests_2022['day'] = date[1].astype('int32')
-nypd_arrests_2022['month'] = date[0].astype('int32')
-nypd_shootings = pd.read_csv('data/crime/NYPD_Shooting_Incident_Data__Historic_.csv')
-nypd_shootings['OCCUR_DATE'] = pd.to_datetime(nypd_shootings['OCCUR_DATE'])
-nypd_shootings['YEAR'] = pd.DatetimeIndex(nypd_shootings['OCCUR_DATE']).year
-nypd_shootings_2022 = nypd_shootings[nypd_shootings['YEAR'] == 2022]
-with open('data/crime/Police_Precincts.geojson') as f:
-    nypd_precincts_geo = json.load(f)
-
+filter_options_old = {
+    "Crime": {
+        "Shootings": {"type": "points", "color": "red", "df_name": "nyc_crime_shootings"},
+        "Arrests": {"type": "points", "color": "green", "df_name": "nyc_crime_arrests"},
+        "NYPD Precincts": {"type": "polygons", "color": "blue", "df_name": "nypd_precincts_geo"},
+    },
+    "Social/Health": {
+        "Air Pollution": {},
+        "Hospitals": {},
+        "Schools": {},
+    },
+    "Environment": {
+        "Parks": {},
+    }
+}
 
 marker_style_shooting = dict(
             size=8,
@@ -87,16 +73,53 @@ marker_style_arrests = dict(
             opacity=1
 )
 
+data_dict = {
+    "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
+    "arrests": {"marker_style": marker_style_arrests},
+    "nypd_precincts": {"color": "#2596be"},
+    "community_districts": {"color": "#f8ff99"},
+    "air_pollution": {},
+    "hospitals": {},
+    "schools": {},
+    "parks": {"color": "#105200"},
+}
+
+filter_options = {
+    "shootings": {"name": "Shootings", "category": "Crime", "type": "points", "color": "red"},
+    "arrests": {"name": "Arrests", "category": "Crime", "type": "points", "color": "green"},
+    "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons", "color": "#2596be"},
+    "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons", "color": "#f8ff99"},
+    "air_pollution": {"name": "Air Pollution", "category": "Social/Health"},
+    "hospitals": {"name": "Hospitals", "category": "Social/Health"},
+    "schools": {"name": "Schools", "category": "Social/Health"},
+    "parks": {"name": "Parks", "category": "Environment", "type": "polygons", "color": "#105200"},
+}
+
+# Data loading and preprocessing
+borough_mapping = get_borough_mappings()
+
+nyc_parks_geo = get_park_geodata()
+data_dict['parks']['data'] = nyc_parks_geo
+nypd_precincts_geo = get_nypd_precincts_geodata()
+data_dict['nypd_precincts']['data'] = nypd_precincts_geo
+community_districts_geo = get_community_districts_geodata()
+data_dict['community_districts']['data'] = community_districts_geo
+
+nyc_crime_shootings = get_crime_shootings()
+data_dict['shootings']['data'] = nyc_crime_shootings
+nyc_crime_arrests = get_crime_arrests()
+data_dict['arrests']['data'] = nyc_crime_arrests
+
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
-fig = go.Figure()
+fig_map = go.Figure(go.Scattermapbox())
 
-fig.add_trace(go.Scattermapbox(
-    mode = "markers",
-    lon = nypd_shootings_2022.Longitude, lat = nypd_shootings_2022.Latitude,
-    marker = marker_style_shooting,
-    text=f"Shooting Incident" # <br>Occur date: {nypd_shootings_2022.OCCUR_DATE}<br>Precinct: {nypd_shootings_2022.PRECINCT}<br>Age group: {nypd_shootings_2022.PERP_AGE_GROUP}<br>Sex: {nypd_shootings_2022.PERP_SEX}<br>Race: {nypd_shootings_2022.PERP_RACE}<br>"
-    ))
+#fig.add_trace(go.Scattermapbox(
+#    mode = "markers",
+#    lon = nyc_crime_shootings.Longitude, lat = nyc_crime_shootings.Latitude,
+#    marker = marker_style_shooting,
+#    text=f"Shooting Incident" # <br>Occur date: {nypd_shootings_2022.OCCUR_DATE}<br>Precinct: {nypd_shootings_2022.PRECINCT}<br>Age group: {nypd_shootings_2022.PERP_AGE_GROUP}<br>Sex: {nypd_shootings_2022.PERP_SEX}<br>Race: {nypd_shootings_2022.PERP_RACE}<br>"
+#    ))
 
 #fig.update_traces(cluster=dict(enabled=True))
 
@@ -107,25 +130,20 @@ fig.add_trace(go.Scattermapbox(
 
 
 
-fig.update_layout(
+fig_map.update_layout(
     mapbox = {
         'style': "stamen-terrain",
-        'center': { 'lon': -73.92969252236846, 'lat': 40.73090468938098},
-        'zoom': 10, 'layers': [{
-            'source': nypd_precincts_geo,
-            'type': "fill", 'below': "traces", 'color': "#2596be", 'opacity': 0.8}]},
+        'center': { 'lon': -73.935242, 'lat': 40.730610},
+        'zoom': 10, 
+    },
     margin = {'l':0, 'r':0, 'b':0, 't':0})
 
 
-fig.update_layout(
+fig_map.update_layout(
     plot_bgcolor=COLORS['background'],
     paper_bgcolor=COLORS['background'],
     font_color=COLORS['text']
 )
-
-fig_life = px.scatter(df_life, x="gdp per capita", y="life expectancy",
-                 size="population", color="continent", hover_name="country",
-                 log_x=True, size_max=60)
 
 boro_indicators = pd.read_csv('data/social/boro_cd_attributes.csv')
 nyc_indicators = pd.read_csv('data/social/city_cd_attributes.csv')
@@ -172,10 +190,75 @@ fig_radar.update_layout(
 )
 
 @app.callback(
+    Output('map-filter', 'options'),
+    Input('map-category', 'value'))
+def set_filter_options(selected_category):
+    print("Selected category: ", selected_category)
+    
+    #return [{'label': i, 'value': i} for i in filter_options[selected_category]].keys() + [{'label': 'All', 'value': 'All'}]
+    options = []
+    if len(selected_category) == 0:
+        return options
+    elif len(selected_category) >= 1:
+        options += [{'label': 'All', 'value': 'All'}]
+        for cat in selected_category:
+            for key, value in filter_options.items():
+                if cat == value['category']:
+                    options += [{'label': value['name'], 'value': key}]
+    return options
+
+
+@app.callback(
+    Output('map', 'figure'),
+    Input('map-filter', 'value'))
+def update_map(filter_values):
+    print("Filters: {}".format(filter_values))
+    print("type: {}".format(type(filter_values)))
+    
+    layers = []
+    
+    fig_map = go.Figure(go.Scattermapbox())
+    
+    if filter_values is not None:
+        for filter_value in filter_values:
+            print("filter_value: {}".format(filter_value))
+            print(f"filter_options[filter_value]['type']: {filter_options[filter_value]['type']}")
+            if filter_options[filter_value]['type'] == 'polygons':
+                print("is polygons")
+                data = data_dict[filter_value]['data']
+                layers.append(
+                    {
+                        'source': data,
+                        'type': "fill", 
+                        'below': "traces", 
+                        'color': data_dict[filter_value]['color'], 
+                        'opacity': 0.8
+                    }
+                )
+            elif filter_options[filter_value]['type'] == 'points':
+                print("is points")
+                data = data_dict[filter_value]['data']
+                fig_map.add_trace(go.Scattermapbox(
+                    lon = data.Longitude, lat = data.Latitude,
+                    marker = data_dict[filter_value]['marker_style'],
+                    text=data_dict[filter_value]['text']
+                ))
+                
+    fig_map.update_layout(
+        mapbox = {
+            'style': "stamen-terrain",
+            'center': { 'lon': -73.935242, 'lat': 40.730610},
+            'zoom': 10, 'layers': layers},
+        margin = {'l':0, 'r':0, 'b':0, 't':0})
+    return fig_map
+
+@app.callback(
     Output('click-data', 'children'),
     Input('radar-chart', 'clickData'))
 def display_click_data(clickData):
     text_values = ""
+    if clickData is None:
+        return ""
     for i in range(0, len(indicators)):
         #if indicators['borough'][i] == clickData['points'][0]['curveNumber']:
         #    selected_category_data[indicators['borough'][i]] = indicators[categories].iloc[i].values
@@ -239,20 +322,28 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
             html.Label('Category'),
             dcc.Dropdown(['Environment', 'Social/Health', 'Crime'],
                         ['Environment'],
-                        multi=True),
+                        multi=True,
+                        id='map-category'
+                        ),
         ], style={'padding': 10, 'flex': 1}),
 
         html.Div(children=[
             html.Label('Filter'),
-            dcc.Checklist(['Parks', 'Bla', 'Blabla'],
-                        ['Parks']
+            dcc.Checklist(
+                        id='map-filter',
+                        inline=True
             ),
         ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flex-direction': 'row'}),
     
+    html.P(
+        children='Test',
+        id='text-test',
+    ),
+    
     dcc.Graph(
         id='map',
-        figure=fig
+        figure=fig_map
     ),
 
     html.Div(className='container', children=[
@@ -297,10 +388,6 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
         'color': COLORS['text']
     }),
 
-    dcc.Graph(
-        id='life-exp-vs-gdp',
-        figure=fig_life
-    ),
     
     html.Div([
         dcc.Markdown(children=markdown_text)
