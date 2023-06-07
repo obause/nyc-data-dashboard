@@ -44,21 +44,7 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 #server = app.server
 
-filter_options_old = {
-    "Crime": {
-        "Shootings": {"type": "points", "color": "red", "df_name": "nyc_crime_shootings"},
-        "Arrests": {"type": "points", "color": "green", "df_name": "nyc_crime_arrests"},
-        "NYPD Precincts": {"type": "polygons", "color": "blue", "df_name": "nypd_precincts_geo"},
-    },
-    "Social/Health": {
-        "Air Pollution": {},
-        "Hospitals": {},
-        "Schools": {},
-    },
-    "Environment": {
-        "Parks": {},
-    }
-}
+
 
 marker_style_shooting = dict(
             size=8,
@@ -82,17 +68,19 @@ data_dict = {
     "hospitals": {},
     "schools": {},
     "parks": {"color": "#105200"},
+    "borough": {"color": "red"},
 }
 
 filter_options = {
-    "shootings": {"name": "Shootings", "category": "Crime", "type": "points", "color": "red"},
-    "arrests": {"name": "Arrests", "category": "Crime", "type": "points", "color": "green"},
-    "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons", "color": "#2596be"},
-    "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons", "color": "#f8ff99"},
+    "shootings": {"name": "Shootings", "category": "Crime", "type": "points"},
+    "arrests": {"name": "Arrests", "category": "Crime", "type": "points"},
+    "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons"},
+    "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
     "air_pollution": {"name": "Air Pollution", "category": "Social/Health"},
     "hospitals": {"name": "Hospitals", "category": "Social/Health"},
     "schools": {"name": "Schools", "category": "Social/Health"},
-    "parks": {"name": "Parks", "category": "Environment", "type": "polygons", "color": "#105200"},
+    "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
+    "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons"},
 }
 
 # Data loading and preprocessing
@@ -109,6 +97,9 @@ nyc_crime_shootings = get_crime_shootings()
 data_dict['shootings']['data'] = nyc_crime_shootings
 nyc_crime_arrests = get_crime_arrests()
 data_dict['arrests']['data'] = nyc_crime_arrests
+
+nyc_borough_geo = get_borough_geodata()
+data_dict['borough']['data'] = nyc_borough_geo
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
@@ -189,6 +180,7 @@ fig_radar.update_layout(
   clickmode='event+select'
 )
 
+# Generate Filter Options
 @app.callback(
     Output('map-filter', 'options'),
     Input('map-category', 'value'))
@@ -221,8 +213,6 @@ def update_map(filter_values):
     
     if filter_values is not None:
         for filter_value in filter_values:
-            print("filter_value: {}".format(filter_value))
-            print(f"filter_options[filter_value]['type']: {filter_options[filter_value]['type']}")
             if filter_options[filter_value]['type'] == 'polygons':
                 print("is polygons")
                 data = data_dict[filter_value]['data']
@@ -232,7 +222,7 @@ def update_map(filter_values):
                         'type': "fill", 
                         'below': "traces", 
                         'color': data_dict[filter_value]['color'], 
-                        'opacity': 0.8
+                        'opacity': data_dict[filter_value].get('opacity', 0.8)
                     }
                 )
             elif filter_options[filter_value]['type'] == 'points':
@@ -335,11 +325,6 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
             ),
         ], style={'padding': 10, 'flex': 1})
     ], style={'display': 'flex', 'flex-direction': 'row'}),
-    
-    html.P(
-        children='Test',
-        id='text-test',
-    ),
     
     dcc.Graph(
         id='map',
