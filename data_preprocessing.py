@@ -115,3 +115,82 @@ def get_borough_geodata():
     with open("data/Borough_Boundaries.geojson") as f:
         nyc_borough_geo = json.load(f)
     return nyc_borough_geo
+
+def get_measures_radar():
+    df_measures_2022 = pd.read_excel(
+       io='data/measures_2022.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+    df_measures_2018 = pd.read_excel(
+       io='data/measures_2018.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+    df_measures_2015 = pd.read_excel(
+       io='data/measures_2015.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+
+    df_radar_2022 = df_measures_2022
+    df_radar_2018 = df_measures_2018
+    df_radar_2015 = df_measures_2015
+
+    df_radar_2022 = df_radar_2022[["Borough","Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"]]
+    df_radar_2022 = pd.melt(df_radar_2022, id_vars=["Borough"], var_name="Category", value_name="Percent", 
+                                value_vars=["Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"])
+    df_radar_2022 = df_radar_2022.round(decimals=0)
+
+    df_radar_2018 = df_radar_2018[["Borough","Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"]]
+    df_radar_2018 = pd.melt(df_radar_2018, id_vars=["Borough"], var_name="Category", value_name="Percent", 
+                                value_vars=["Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"])
+    df_radar_2018 = df_radar_2018.round(decimals=0)
+
+    df_radar_2015 = df_radar_2015[["Borough","Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"]]
+    df_radar_2015 = pd.melt(df_radar_2015, id_vars=["Borough"], var_name="Category", value_name="Percent", 
+                                value_vars=["Poverty","Unemployment","Air Pollution","Bike Coverage","Smoking","Obesity"])
+    df_radar_2015 = df_radar_2015.round(decimals=0)
+    
+    return df_radar_2022, df_radar_2018, df_radar_2015
+
+def get_measures_stacked():
+    df_measures_2022 = pd.read_excel(
+       io='data/measures_2022.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+    df_measures_2018 = pd.read_excel(
+       io='data/measures_2018.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+    df_measures_2015 = pd.read_excel(
+       io='data/measures_2015.xlsx',
+       sheet_name ='CHP_all_data'
+    )
+    
+    df_stacked_2022 = df_measures_2022
+    df_stacked_2018 = df_measures_2018
+    df_stacked_2015 = df_measures_2015
+
+    df_stacked_2022 = df_stacked_2022[["Borough","Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"]]
+    #df_stacked_2022 = df_stacked_2022.round(decimals=2)
+    df_stacked_2022 = pd.melt(df_stacked_2022, id_vars=["Borough"], var_name="Range", value_name="Percent", 
+                                value_vars=["Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"])
+
+    df_stacked_2018 = df_stacked_2018[["Borough","Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"]]
+    #df_stacked_2018 = df_stacked_2018.round(decimals=2)
+    df_stacked_2018 = pd.melt(df_stacked_2018, id_vars=["Borough"], var_name="Range", value_name="Percent", 
+                                value_vars=["Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"])
+
+    df_stacked_2015 = df_stacked_2015[["Borough","Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"]]
+    #df_stacked_2015 = df_stacked_2015.round(decimals=2)
+    df_stacked_2015 = pd.melt(df_stacked_2015, id_vars=["Borough"], var_name="Range", value_name="Percent", 
+                                value_vars=["Age 0 - 17","Age 18 - 24","Age 25 - 44","Age 45 - 64","Age 65 plus"])
+    
+    return df_stacked_2022, df_stacked_2018, df_stacked_2015
+
+def get_timeline():
+    df_timeline = pd.read_csv('data/medianAskingRent_grouped.csv', sep=';')
+    return df_timeline
+
+def get_school_loc():
+    df_school_loc = pd.read_csv('data/school_locations_2019_2020.csv')
+    df_school_loc.rename(columns={"LONGITUDE": "Longitude", "LATITUDE": "Latitude"}, inplace=True)
+    return df_school_loc

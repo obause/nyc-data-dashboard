@@ -8,6 +8,7 @@ pandas==2.0.1
 scipy==1.10.1
 matplotlib==3.7.1
 numpy==1.24.3
+openpyxl==3.1.2
 
 # Jupyter Notebook support
 jupyter-dash==0.4.2

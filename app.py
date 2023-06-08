@@ -77,6 +77,12 @@ marker_style_cars = dict(
             opacity=1
 )
 
+marker_style_schools = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
 data_dict = {
     "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
     "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
@@ -84,7 +90,7 @@ data_dict = {
     "community_districts": {"color": "#f8ff99"},
     "air_pollution": {"colorscale": ['green', 'orange', 'red', 'red'], "zmin": 0, "zmax": 7,},
     "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
-    "schools": {},
+    "schools": {"marker_style": marker_style_schools, "text": "School"},
     "parks": {"color": "#105200"},
     "borough": {"color": "white"},
     "borough_labels": {"mode": "text", "type": "points"},
@@ -99,7 +105,7 @@ filter_options = {
     "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
     "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "choropleth"},
     "hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
-    "schools": {"name": "Schools", "category": "Social/Health"},
+    "schools": {"name": "Schools", "category": "Social/Health", "type": "points"},
     "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
     "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
     "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
@@ -149,6 +155,16 @@ data_dict['air_pollution']['text'] = pd_by_cm['Geo Place Name']
 data_dict['air_pollution']['locations'] = pd_by_cm['Geo Join ID']
 data_dict['air_pollution']['values'] = pd_by_cm['Data Value']
 data_dict['air_pollution']['geodata'] = community_districts_geo
+
+df_radar_2022, df_radar_2018, df_radar_2015 = get_measures_radar()
+df_stacked_2022, df_stacked_2018, df_stacked_2015 = get_measures_stacked()
+df_timeline = get_timeline()
+
+df_school_loc = get_school_loc()
+data_dict['schools']['data'] = df_school_loc
+data_dict['schools']['text'] = df_school_loc['location_name']
+
+
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
@@ -326,65 +342,117 @@ def update_map(filter_values):
         )
     return fig_map
 
-#@app.callback(
-#    Output('radar-bar-chart', 'figure'),
-#    Input('radar-chart', 'clickData'))
-def update_radar_bar_chart(clickData):
-    fig_radar_bar = go.Figure(go.Bar())
-    if clickData is None:
-        return ""
-    #print("clickData: ", clickData)
-    selected_indicator = clickData['points'][0]['theta']
-    print("selected_indicator: ", selected_indicator)
-    fig_radar_bar.add_trace(go.Bar(
-        y=indicators['Poverty Rate'],
-        x=indicators['borough'],
-        text=indicators[selected_indicator],
-    ))
-    fig_radar_bar.update_layout(
-        title=selected_indicator,
-        xaxis_tickfont_size=14,
-        yaxis=dict(
-            title='Percentage %',
-            titlefont_size=16,
-            tickfont_size=14,
-        ),
-        barmode='group',
-        bargap=0.0, # gap between bars of adjacent location coordinates.
-        bargroupgap=0.0 # gap between bars of the same location coordinate.
-    )
-    fig_radar_bar.update_layout(
-    showlegend=False,
-    #hovermode="y unified",
-    )
-    return fig_radar_bar
+@app.callback(
+    Output("graph", "figure"),
+    Input("dropdown", "value")
+)
+def update_line_chart(selected_year):
+    df = df_timeline
+    
+    if selected_year == 20:
+        fig = px.line(df, x="Date", y="Miete", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        xaxis_label = 'Year'
+        yaxis_label = 'Rent'
+        
+    else:
+        mask = df["Jahr"] == selected_year
+        fig = px.line(df[mask], x="Monate", y="Miete", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        xaxis_label = 'Month'
+        yaxis_label = 'Rent'
+
+    fig.update_yaxes(range=[500, 4500]) 
+    fig.update_traces(connectgaps=True, selector=dict(type='line'))
+    fig.update_layout(
+        xaxis_title = xaxis_label,  
+        yaxis_title = yaxis_label,
+        title_x=0.5
+    )  
+    return fig
 
 
 @app.callback(
-    Output('click-data', 'children'),
-    Input('radar-chart', 'clickData'))
-def display_click_data(clickData):
-    text_values = ""
-    if clickData is None:
-        return ""
-    for i in range(0, len(indicators)):
-        #if indicators['borough'][i] == clickData['points'][0]['curveNumber']:
-        #    selected_category_data[indicators['borough'][i]] = indicators[categories].iloc[i].values
-        if i == clickData['points'][0]['curveNumber']:
-            text_values += f"""
-    **{indicators['borough'][i]}: {indicators[clickData['points'][0]['theta']].iloc[i]}**
-            """
-        else:
-            text_values += f"""
-    {indicators['borough'][i]}: {indicators[clickData['points'][0]['theta']].iloc[i]}
-            """
-    text = f"""
-    ##### {clickData['points'][0]['theta']}
-    {text_values}
-    """
-    #return json.dumps(clickData, indent=2)
-    print(clickData)
-    return text
+    Output("stacked", "figure"),
+    Input("slider", "value")
+)
+def update_stacked(selected_year):
+    df_2022 = df_stacked_2022
+    df_2018 = df_stacked_2018
+    df_2015 = df_stacked_2015
+    
+    if selected_year == 3:
+        fig = px.bar(data_frame= df_2022, x="Borough", y="Percent", color="Range",opacity=0.9,orientation="v",barmode="relative",
+                     title="Distribution of Age")
+    elif selected_year == 2:
+        fig = px.bar(data_frame= df_2018, x="Borough", y="Percent", color="Range",opacity=0.9,orientation="v",barmode="relative",
+                     title="Distribution of Age")
+    else:
+        fig = px.bar(data_frame= df_2015, x="Borough", y="Percent", color="Range",opacity=0.9,orientation="v",barmode="relative",
+                     title="Distribution of Age")
+    
+    fig.update_layout(
+        title_x=0.5
+    )
+    return fig
+
+
+@app.callback(
+    Output("radar", "figure"),
+    Input("slider", "value")
+)
+def update_radar(selected_year):
+    df_2022 = df_radar_2022
+    df_2018 = df_radar_2018
+    df_2015 = df_radar_2015
+    
+    if selected_year == 3:
+        fig = px.line_polar(df_2022, r="Percent", 
+                    theta="Category", 
+                    color="Borough",
+                    line_close=True,
+                    line_shape="spline",
+                    hover_name="Borough",
+                    hover_data={"Borough":False},
+                    markers=True,
+                    range_r=[0,35],
+                    direction="clockwise",
+                    start_angle=45,
+                    title="Detailed Overview of Boroughs"
+                   )
+    elif selected_year == 2:
+        fig = px.line_polar(df_2018, r="Percent", 
+                    theta="Category", 
+                    color="Borough",
+                    line_close=True,
+                    line_shape="spline",
+                    hover_name="Borough",
+                    hover_data={"Borough":False},
+                    markers=True,
+                    range_r=[0,35],
+                    direction="clockwise",
+                    start_angle=45,
+                    title="Detailed Overview of Boroughs"
+                   )
+    else:
+        fig = px.line_polar(df_2015, r="Percent", 
+                    theta="Category", 
+                    color="Borough",
+                    line_close=True,
+                    line_shape="spline",
+                    hover_name="Borough",
+                    hover_data={"Borough":False},
+                    markers=True,
+                    range_r=[0,35],
+                    direction="clockwise",
+                    start_angle=45,
+                    title="Detailed Overview of Boroughs",
+                   )
+    fig.update_layout(
+        title_x=0.5
+    )
+    return fig
+
+
+
 
 markdown_text = '''
 ##### Dash and Markdown
@@ -397,158 +465,119 @@ if this is your first introduction to Markdown!
 '''
 
 # App layout
-app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=[
-    html.H1(
-        children='New York Smart City Dashboard',
-        style={
-            'textAlign': 'center',
-            'color': COLORS['text']
-        }
+app.layout = dbc.Container([
+    dbc.Row(
+        html.H1(
+            children='New York Smart City Dashboard',
+            style={
+                'textAlign': 'center',
+                'color': COLORS['text']
+            }
+        ),
     ),
-    html.P(
-        children='by Ole Bause and Alexander Barkov',
-        style={
-            'textAlign': 'center',
-            'color': COLORS['text']
-        },
-        className='lead'
+    dbc.Row(
+        html.P(
+            children='by Ole Bause and Alexander Barkov',
+            style={
+                'textAlign': 'center',
+                'color': COLORS['text']
+                },
+           className='lead'
+        ),      
     ),
     
-    html.Hr(),
+    dbc.Row([
+        html.Hr(),
 
-    html.H3(
-        children='Map of NYC',
-        style={
-            'textAlign': 'center',
-            'color': COLORS['text']
-        }
-    ),
-    
-    html.Div([
-        html.Div(children=[
+        html.H3(
+            children='Map of NYC',
+            style={
+                'textAlign': 'center',
+                'color': COLORS['text']
+            }
+        ),    
+    ]),
+    dbc.Row([
+        dbc.Col([
             html.Br(),
             html.Label('Category'),
             dcc.Dropdown(['Environment', 'Social/Health', 'Crime'],
-                        ['Environment'],
-                        multi=True,
-                        id='map-category'
-                        ),
-        ], style={'padding': 10, 'flex': 1}),
-
-        html.Div(children=[
+                         ['Environment'],
+                         multi=True,
+                         id='map-category'
+                         ), #style={'padding': 10, 'flex': 1}  
+        ]),
+        dbc.Col([
             html.Label('Filter'),
             dcc.Checklist(
                         id='map-filter',
                         inline=True
-            ),
-        ], style={'padding': 10, 'flex': 1})
-    ], style={'display': 'flex', 'flex-direction': 'row'}),
-    
-    dcc.Graph(
-        id='map',
-        figure=fig_map
+            ),    
+        ]), #style={'padding': 10, 'flex': 1})
+    ]), #style={'display': 'flex', 'flex-direction': 'row'}),
+    dbc.Row(
+        dcc.Graph(
+            id='map',
+            figure=fig_map
+        ),    
     ),
-
-    html.Div(className='container', children=[
-        html.Div(className='row', children=[
-            html.H3(
-                children='Radar Chart',
-                style={
-                    'textAlign': 'center',
-                    'color': COLORS['text']
-                }
+    dbc.Row(
+        dbc.Col(
+            dcc.Graph(id="graph")
+        )
+    ),
+    dbc.Row([
+            dbc.Col(
+                dcc.Dropdown(
+                    id="dropdown",
+                    options=[
+                        {"label": "Complete Timeline", "value": 20},
+                        {"label": "2010", "value": 2010},
+                        {"label": "2011", "value": 2011},
+                        {"label": "2012", "value": 2012},
+                        {"label": "2013", "value": 2013},
+                        {"label": "2014", "value": 2014},
+                        {"label": "2015", "value": 2015},
+                        {"label": "2016", "value": 2016},
+                        {"label": "2017", "value": 2017},
+                        {"label": "2018", "value": 2018},
+                        {"label": "2019", "value": 2019},
+                        {"label": "2020", "value": 2020},
+                        {"label": "2021", "value": 2021},
+                        {"label": "2022", "value": 2022},
+                        {"label": "2023", "value": 2023},
+                    ],
+                    value=20,
+                ), width={"size": 2, "offset": 0}
             ),
-            html.P(
-                children='Beischreibung zum Radar Chart',
-                style={
-                    'textAlign': 'center',
-                    'color': COLORS['text']
-                },
-                className='lead'
-            ),
-        ]),
-        html.Div(className='row', children=[
-            html.Div([
-                dcc.Graph(
-                    id='radar-chart',
-                    figure=fig_radar
-                ),
-            ], className='col-sm-8'),
-
-            html.Div([
-                dcc.Markdown("""
-                    **Data**
-                """, id='click-data'),
-            # html.P(id='click-data')#, style=styles['pre']),
-            ], className='col-sm-2'),
-
-            #html.Div(className='row', children=[
-            #    html.Div([
-            #        dcc.Graph(
-            #            id='radar-bar-chart',
-            #            figure=fig_radar_bar
-            #        ),
-            #    ], className='col-sm-6'),
-            #]),
-        ]),
-        
-    ]),
-    
-    html.Div(children='Dash: A web application framework for your data.', style={
-        'textAlign': 'center',
-        'color': COLORS['text']
-    }),
-
-    
-    html.Div([
-        dcc.Markdown(children=markdown_text)
-    ]),
-    
-    html.H3(
-        children='Dash Controls',
-        style={
-            'textAlign': 'center',
-            'color': COLORS['text']
-        }
+        ], className="mt-4",
     ),
     
-    html.Div([
-        html.Div(children=[
-            html.Label('Dropdown'),
-            dcc.Dropdown(['New York City', 'Montréal', 'San Francisco'], 'Montréal'),
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(id="stacked")
+        ], width=6),
+        dbc.Col([
+            dcc.Graph(id="radar")
+        ], width=6),
+    ]),
+    dbc.Row(
+        dbc.Col(
+            dcc.Slider(1, 3, 1,
+                       value=2,
+                       id='slider',
+                       marks={
+                           1: {'label': '2015', 'style': {'color': '#77b0b1'}},
+                           2: {'label': '2018', 'style': {'color': '#77b0b1'}},
+                           3: {'label': '2022', 'style': {'color': '#77b0b1'}},
+                       }, included=False
+            ), width={"size": 5, "offset": 4}
+        )
+    ),
+    
+    ],fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
 
-            html.Br(),
-            html.Label('Multi-Select Dropdown'),
-            dcc.Dropdown(['New York City', 'Montréal', 'San Francisco'],
-                        ['Montréal', 'San Francisco'],
-                        multi=True),
 
-            html.Br(),
-            html.Label('Radio Items'),
-            dcc.RadioItems(['New York City', 'Montréal', 'San Francisco'], 'Montréal'),
-        ], style={'padding': 10, 'flex': 1}),
-
-        html.Div(children=[
-            html.Label('Checkboxes'),
-            dcc.Checklist(['New York City', 'Montréal', 'San Francisco'],
-                        ['Montréal', 'San Francisco']
-            ),
-
-            html.Br(),
-            html.Label('Text Input'),
-            dcc.Input(value='MTL', type='text'),
-
-            html.Br(),
-            html.Label('Slider'),
-            dcc.Slider(
-                min=0,
-                max=9,
-                marks={i: f'Label {i}' if i == 1 else str(i) for i in range(1, 6)},
-                value=5,
-            ),
-        ], style={'padding': 10, 'flex': 1})
-    ], style={'display': 'flex', 'flex-direction': 'row'})
-])
 
 if __name__ == '__main__':
     app.run_server(debug=True, processes=1, threaded=False)
