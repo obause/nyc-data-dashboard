@@ -314,9 +314,9 @@ def update_map(filter_values):
         )
     return fig_map
 
-@app.callback(
-    Output('radar-bar-chart', 'figure'),
-    Input('radar-chart', 'clickData'))
+#@app.callback(
+#    Output('radar-bar-chart', 'figure'),
+#    Input('radar-chart', 'clickData'))
 def update_radar_bar_chart(clickData):
     fig_radar_bar = go.Figure(go.Bar())
     if clickData is None:
@@ -470,14 +470,14 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
             # html.P(id='click-data')#, style=styles['pre']),
             ], className='col-sm-2'),
 
-            html.Div(className='row', children=[
-                html.Div([
-                    dcc.Graph(
-                        id='radar-bar-chart',
-                        figure=fig_radar_bar
-                    ),
-                ], className='col-sm-6'),
-            ]),
+            #html.Div(className='row', children=[
+            #    html.Div([
+            #        dcc.Graph(
+            #            id='radar-bar-chart',
+            #            figure=fig_radar_bar
+            #        ),
+            #    ], className='col-sm-6'),
+            #]),
         ]),
         
     ]),
