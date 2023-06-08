@@ -76,17 +76,20 @@ def get_car_accident_data():
     car_accidents = pd.read_csv('data/crime/car_accidents_2022.csv')
     return car_accidents
 
-def get_air_quality_data(measure_name='Boiler Emissions- Total PM2.5 Emissions'):
+def get_air_quality_data(measure_name='Fine Particulate Matter (PM2.5)', time_period='Annual Average 2020'):
     air_quality = pd.read_csv("data/social/NYCgov_Air_Quality.csv")
     air_quality = air_quality[air_quality['Name'] == measure_name]
     nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
-    air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == '2015')]
-    pd_by_cm = pd.merge(air_quality, nyc_cd, left_on='Geo Join ID', right_on='BoroCD')
+    pd_by_cm = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == time_period)]
+    #pd_by_cm = pd.merge(air_quality, nyc_cd, left_on='Geo Join ID', right_on='BoroCD')
+    pd_by_cm['Name'].unique()
     nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
     gdf.drop('the_geom', axis=1, inplace=True)
     multipolygon_json = json.loads(gdf.to_json())
-    return multipolygon_json
+    gdf = gdf.set_index('BoroCD')
+    
+    return multipolygon_json, pd_by_cm
     
 
 def get_squirrels():

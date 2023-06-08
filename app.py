@@ -82,7 +82,7 @@ data_dict = {
     "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
     "nypd_precincts": {"color": "#2596be"},
     "community_districts": {"color": "#f8ff99"},
-    "air_pollution": {"color": "#f8ff99"},
+    "air_pollution": {"colorscale": ['green', 'orange', 'red', 'red'], "zmin": 0, "zmax": 7,},
     "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
     "schools": {},
     "parks": {"color": "#105200"},
@@ -97,7 +97,7 @@ filter_options = {
     "arrests": {"name": "Arrests", "category": "Crime", "type": "density"},
     "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons"},
     "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
-    "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "polygons"},
+    "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "choropleth"},
     "hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
     "schools": {"name": "Schools", "category": "Social/Health"},
     "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
@@ -142,6 +142,13 @@ data_dict['borough']['data'] = nyc_borough_geo
 nyc_borough_mapping = get_borough_mappings()
 data_dict['borough_labels']['data'] = nyc_borough_mapping
 data_dict['borough_labels']['text'] = nyc_borough_mapping['borough_name']
+
+multipolygon_json, pd_by_cm = get_air_quality_data(measure_name='Fine Particulate Matter (PM2.5)')
+data_dict['air_pollution']['data'] = pd_by_cm
+data_dict['air_pollution']['text'] = pd_by_cm['Geo Place Name']
+data_dict['air_pollution']['locations'] = pd_by_cm['Geo Join ID']
+data_dict['air_pollution']['values'] = pd_by_cm['Data Value']
+data_dict['air_pollution']['geodata'] = community_districts_geo
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
@@ -291,15 +298,20 @@ def update_map(filter_values):
                     hovertext=data_dict[filter_value].get('text'),
                     ))
                 
-            elif filter_options[filter_value]['type'] == 'chloropeth':
+            elif filter_options[filter_value]['type'] == 'choropleth':
                 print("is chloropeth")
+                geodata = data_dict[filter_value]['geodata']
                 data = data_dict[filter_value]['data']
-                fig_map.add_trace(go.Densitymapbox(
-                    lon = data.Longitude, lat = data.Latitude,
-                    radius=data_dict[filter_value].get('radius',3),
+                values = data_dict[filter_value].get('values')
+                print("len values:", len(values))
+                fig_map.add_trace(go.Choroplethmapbox(
+                    geojson=geodata,
+                    locations=data_dict[filter_value].get('locations'),
+                    z=values,
+                    zmin=values.min(),
+                    zmax=values.min(),
                     colorscale=data_dict[filter_value].get('colorscale', 'hot'),
-                    text=data_dict[filter_value].get('text'),
-                    hovertext=data_dict[filter_value].get('text'),
+                    marker_opacity=0.5, marker_line_width=0
                     ))
                 
     fig_map.update_layout(
