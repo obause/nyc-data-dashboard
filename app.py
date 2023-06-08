@@ -55,32 +55,56 @@ marker_style_shooting = dict(
 marker_style_arrests = dict(
             size=6,
             color='rgb(0, 255, 0)',
-            symbol='bus',
+            #symbol='bus',
+            opacity=1
+)
+
+marker_style_squirrels = dict(
+            size=4,
+            color='orange',
+            opacity=1
+)
+
+marker_style_hospitals = dict(
+            size=8,
+            color='rgb(0, 0, 255)',
+            opacity=1
+)
+
+marker_style_cars = dict(
+            size=6,
+            color='black',
             opacity=1
 )
 
 data_dict = {
     "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
-    "arrests": {"marker_style": marker_style_arrests},
+    "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
     "nypd_precincts": {"color": "#2596be"},
     "community_districts": {"color": "#f8ff99"},
-    "air_pollution": {},
-    "hospitals": {},
+    "air_pollution": {"color": "#f8ff99"},
+    "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
     "schools": {},
     "parks": {"color": "#105200"},
-    "borough": {"color": "red"},
+    "borough": {"color": "white"},
+    "borough_labels": {"mode": "text", "type": "points"},
+    "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
+    "car_accidents": {"marker_style": marker_style_cars, "text": "Car Accident", "colorscale": 'Reds', "radius": 2},
 }
 
 filter_options = {
     "shootings": {"name": "Shootings", "category": "Crime", "type": "points"},
-    "arrests": {"name": "Arrests", "category": "Crime", "type": "points"},
+    "arrests": {"name": "Arrests", "category": "Crime", "type": "density"},
     "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons"},
     "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
-    "air_pollution": {"name": "Air Pollution", "category": "Social/Health"},
-    "hospitals": {"name": "Hospitals", "category": "Social/Health"},
+    "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "polygons"},
+    "hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
     "schools": {"name": "Schools", "category": "Social/Health"},
     "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
-    "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons"},
+    "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
+    "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
+    "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
+    "car_accidents": {"name": "Car Accidents", "category": "Crime", "type": "density" },
 }
 
 # Data loading and preprocessing
@@ -97,9 +121,27 @@ nyc_crime_shootings = get_crime_shootings()
 data_dict['shootings']['data'] = nyc_crime_shootings
 nyc_crime_arrests = get_crime_arrests()
 data_dict['arrests']['data'] = nyc_crime_arrests
+data_dict['arrests']['text'] = nyc_crime_arrests['OFNS_DESC']
+
+squirrels = get_squirrels()
+data_dict['squirrels']['data'] = squirrels
+
+hospitals = get_hospital_data()
+data_dict['hospitals']['data'] = hospitals
+data_dict['hospitals']['text'] = hospitals['Facility Name']
+
+car_accidents = get_car_accident_data()
+data_dict['car_accidents']['data'] = car_accidents
+data_dict['car_accidents']['text'] = car_accidents['CONTRIBUTING FACTOR VEHICLE 1']
+
+air_quality_geo = get_air_quality_data()
+data_dict['air_pollution']['data'] = air_quality_geo
 
 nyc_borough_geo = get_borough_geodata()
 data_dict['borough']['data'] = nyc_borough_geo
+nyc_borough_mapping = get_borough_mappings()
+data_dict['borough_labels']['data'] = nyc_borough_mapping
+data_dict['borough_labels']['text'] = nyc_borough_mapping['borough_name']
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
@@ -123,11 +165,14 @@ fig_map = go.Figure(go.Scattermapbox())
 
 fig_map.update_layout(
     mapbox = {
-        'style': "stamen-terrain",
-        'center': { 'lon': -73.935242, 'lat': 40.730610},
-        'zoom': 10, 
-    },
-    margin = {'l':0, 'r':0, 'b':0, 't':0})
+            'accesstoken': mapbox_access_token,
+            #'style': "stamen-terrain",
+            'center': { 'lon': -73.935242, 'lat': 40.730610},
+            'zoom': 10, 
+        },
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+        height=800,
+    )
 
 
 fig_map.update_layout(
@@ -136,20 +181,7 @@ fig_map.update_layout(
     font_color=COLORS['text']
 )
 
-boro_indicators = pd.read_csv('data/social/boro_cd_attributes.csv')
-nyc_indicators = pd.read_csv('data/social/city_cd_attributes.csv')
-nyc_indicators['borough'] = 'New York City'
-indicators = pd.concat([boro_indicators, nyc_indicators]).reset_index(drop=True)
-indicators_legend = {
-    'under18_rate': 'Age under 18', 
-    'over65_rate': 'Age 65 & Over',
-    'lep_rate': 'Limited English Proficiency', 
-    'pct_hh_rent_burd': 'Rent Burdened',
-    'poverty_rate': 'Poverty Rate',
-    'unemployment': 'Unemployment Rate',
-    'crime_per_1000': 'Crime Rate',
-    }
-indicators.rename(columns=indicators_legend, inplace=True)
+indicators = get_nyc_borough_indicators()
 categories = [
     'Age under 18', 
     'Age 65 & Over',
@@ -179,6 +211,7 @@ fig_radar.update_layout(
   hovermode="x unified",
   clickmode='event+select'
 )
+fig_radar_bar = go.Figure(go.Bar())
 
 # Generate Filter Options
 @app.callback(
@@ -197,6 +230,7 @@ def set_filter_options(selected_category):
             for key, value in filter_options.items():
                 if cat == value['category']:
                     options += [{'label': value['name'], 'value': key}]
+
     return options
 
 
@@ -208,39 +242,111 @@ def update_map(filter_values):
     print("type: {}".format(type(filter_values)))
     
     layers = []
+    center = { 'lon': -73.935242, 'lat': 40.730610}
+    zoom = 10
     
     fig_map = go.Figure(go.Scattermapbox())
     
     if filter_values is not None:
         for filter_value in filter_values:
+            if filter_options[filter_value].get('connected_to') is not None:
+                filter_values.append(filter_options[filter_value]['connected_to'])
+            
+            if data_dict[filter_value].get('center') is not None:
+                center = data_dict[filter_value]['center']
+            
+            if data_dict[filter_value].get('zoom') is not None:
+                zoom = data_dict[filter_value]['zoom']
+            
             if filter_options[filter_value]['type'] == 'polygons':
-                print("is polygons")
                 data = data_dict[filter_value]['data']
                 layers.append(
                     {
                         'source': data,
                         'type': "fill", 
                         'below': "traces", 
-                        'color': data_dict[filter_value]['color'], 
+                        'color': data_dict[filter_value].get('color'), 
                         'opacity': data_dict[filter_value].get('opacity', 0.8)
                     }
                 )
+                
             elif filter_options[filter_value]['type'] == 'points':
                 print("is points")
                 data = data_dict[filter_value]['data']
                 fig_map.add_trace(go.Scattermapbox(
                     lon = data.Longitude, lat = data.Latitude,
-                    marker = data_dict[filter_value]['marker_style'],
-                    text=data_dict[filter_value]['text']
+                    marker = data_dict[filter_value].get('marker_style'),
+                    text=data_dict[filter_value].get('text'),
+                    mode=data_dict[filter_value].get('mode', 'markers'),
                 ))
+                
+            elif filter_options[filter_value]['type'] == 'density':
+                print("is density")
+                data = data_dict[filter_value]['data']
+                fig_map.add_trace(go.Densitymapbox(
+                    lon = data.Longitude, lat = data.Latitude,
+                    radius=data_dict[filter_value].get('radius',3),
+                    colorscale=data_dict[filter_value].get('colorscale', 'hot'),
+                    text=data_dict[filter_value].get('text'),
+                    hovertext=data_dict[filter_value].get('text'),
+                    ))
+                
+            elif filter_options[filter_value]['type'] == 'chloropeth':
+                print("is chloropeth")
+                data = data_dict[filter_value]['data']
+                fig_map.add_trace(go.Densitymapbox(
+                    lon = data.Longitude, lat = data.Latitude,
+                    radius=data_dict[filter_value].get('radius',3),
+                    colorscale=data_dict[filter_value].get('colorscale', 'hot'),
+                    text=data_dict[filter_value].get('text'),
+                    hovertext=data_dict[filter_value].get('text'),
+                    ))
                 
     fig_map.update_layout(
         mapbox = {
-            'style': "stamen-terrain",
-            'center': { 'lon': -73.935242, 'lat': 40.730610},
-            'zoom': 10, 'layers': layers},
-        margin = {'l':0, 'r':0, 'b':0, 't':0})
+            'accesstoken': mapbox_access_token,
+            #'style': "stamen-terrain",
+            'center': center,
+            'zoom': zoom, 'layers': layers},
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+        height=800,
+        transition_duration=500,
+        )
     return fig_map
+
+@app.callback(
+    Output('radar-bar-chart', 'figure'),
+    Input('radar-chart', 'clickData'))
+def update_radar_bar_chart(clickData):
+    fig_radar_bar = go.Figure(go.Bar())
+    if clickData is None:
+        return ""
+    #print("clickData: ", clickData)
+    selected_indicator = clickData['points'][0]['theta']
+    print("selected_indicator: ", selected_indicator)
+    fig_radar_bar.add_trace(go.Bar(
+        y=indicators['Poverty Rate'],
+        x=indicators['borough'],
+        text=indicators[selected_indicator],
+    ))
+    fig_radar_bar.update_layout(
+        title=selected_indicator,
+        xaxis_tickfont_size=14,
+        yaxis=dict(
+            title='Percentage %',
+            titlefont_size=16,
+            tickfont_size=14,
+        ),
+        barmode='group',
+        bargap=0.0, # gap between bars of adjacent location coordinates.
+        bargroupgap=0.0 # gap between bars of the same location coordinate.
+    )
+    fig_radar_bar.update_layout(
+    showlegend=False,
+    #hovermode="y unified",
+    )
+    return fig_radar_bar
+
 
 @app.callback(
     Output('click-data', 'children'),
@@ -352,9 +458,9 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
         html.Div(className='row', children=[
             html.Div([
                 dcc.Graph(
-            id='radar-chart',
-            figure=fig_radar
-        ),
+                    id='radar-chart',
+                    figure=fig_radar
+                ),
             ], className='col-sm-8'),
 
             html.Div([
@@ -362,10 +468,18 @@ app.layout = html.Div(style={'backgroundColor': COLORS['background']}, children=
                     **Data**
                 """, id='click-data'),
             # html.P(id='click-data')#, style=styles['pre']),
-            ], className='col-sm-4'),
+            ], className='col-sm-2'),
 
-            
+            html.Div(className='row', children=[
+                html.Div([
+                    dcc.Graph(
+                        id='radar-bar-chart',
+                        figure=fig_radar_bar
+                    ),
+                ], className='col-sm-6'),
+            ]),
         ]),
+        
     ]),
     
     html.Div(children='Dash: A web application framework for your data.', style={

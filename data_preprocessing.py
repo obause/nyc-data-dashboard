@@ -1,5 +1,8 @@
 import pandas as pd
 import json
+import geopandas as gpd
+from shapely.geometry import shape
+from shapely import wkt
 
 import plotly.express as px
 #import chart_studio.plotly as py
@@ -24,8 +27,8 @@ def get_borough_mappings():
         "boro_code": [1, 2, 3, 4, 5],
         "boro_short1": ["M", "X", "B", "Q", "R"],
         "boro_short2": ["M", "B", "K", "Q", "S"],
-        "lat": [40.776676,40.837048,40.650002,40.742054,40.579021],
-        "lon": [-73.971321,-73.865433,-73.949997,-73.769417, -74.151535]
+        "Latitude": [40.776676,40.837048,40.650002,40.742054,40.579021],
+        "Longitude": [-73.971321,-73.865433,-73.949997,-73.769417, -74.151535]
     })
     return borough_mapping
 
@@ -47,6 +50,48 @@ def get_crime_shootings(year=2022):
     nypd_shootings['YEAR'] = pd.DatetimeIndex(nypd_shootings['OCCUR_DATE']).year
     nypd_shootings = nypd_shootings[nypd_shootings['YEAR'] == year]
     return nypd_shootings
+
+def get_nyc_borough_indicators():
+    boro_indicators = pd.read_csv('data/social/boro_cd_attributes.csv')
+    nyc_indicators = pd.read_csv('data/social/city_cd_attributes.csv')
+    nyc_indicators['borough'] = 'New York City'
+    indicators = pd.concat([boro_indicators, nyc_indicators]).reset_index(drop=True)
+    indicators_legend = {
+        'under18_rate': 'Age under 18', 
+        'over65_rate': 'Age 65 & Over',
+        'lep_rate': 'Limited English Proficiency', 
+        'pct_hh_rent_burd': 'Rent Burdened',
+        'poverty_rate': 'Poverty Rate',
+        'unemployment': 'Unemployment Rate',
+        'crime_per_1000': 'Crime Rate',
+        }
+    indicators.rename(columns=indicators_legend, inplace=True)
+    return indicators
+
+def get_hospital_data():
+    hospitals = pd.read_csv('data/social/NYC_Health___Hospitals_patient_care_locations_-_2011.csv')
+    return hospitals
+
+def get_car_accident_data():
+    car_accidents = pd.read_csv('data/crime/car_accidents_2022.csv')
+    return car_accidents
+
+def get_air_quality_data(measure_name='Boiler Emissions- Total PM2.5 Emissions'):
+    air_quality = pd.read_csv("data/social/NYCgov_Air_Quality.csv")
+    air_quality = air_quality[air_quality['Name'] == measure_name]
+    nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
+    air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == '2015')]
+    pd_by_cm = pd.merge(air_quality, nyc_cd, left_on='Geo Join ID', right_on='BoroCD')
+    nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
+    gdf.drop('the_geom', axis=1, inplace=True)
+    multipolygon_json = json.loads(gdf.to_json())
+    return multipolygon_json
+    
+
+def get_squirrels():
+    squirrels = pd.read_csv('data/environment/2018_Central_Park_Squirrel_Census_-_Squirrel_Data.csv')
+    return squirrels
 
 def get_nypd_precincts_geodata():
     with open('data/crime/Police_Precincts.geojson') as f:
