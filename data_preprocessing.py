@@ -112,6 +112,7 @@ def get_community_districts_geodata():
     with open("data/reference_data/UHF42.geo.json") as f:
         nyc_uhf42_geo = json.load(f)
     return nyc_uhf42_geo
+<<<<<<< Updated upstream
 
 def get_borough_geodata():
     with open("data/Borough_Boundaries.geojson") as f:
@@ -208,3 +209,6 @@ def get_facilities(facgroup = None, facsubgrp = None):
         return df_facilities[df_facilities['facsubgrp'] == facsubgrp]
 
     return df_facilities
+=======
+######################################
+>>>>>>> Stashed changes
