@@ -112,7 +112,7 @@ def get_community_districts_geodata():
     with open("data/reference_data/UHF42.geo.json") as f:
         nyc_uhf42_geo = json.load(f)
     return nyc_uhf42_geo
-<<<<<<< Updated upstream
+
 
 def get_borough_geodata():
     with open("data/Borough_Boundaries.geojson") as f:
@@ -199,16 +199,16 @@ def get_school_loc():
     return df_school_loc
 
 def get_facilities(facgroup = None, facsubgrp = None):
-    df_facilities = pd.read_csv('data/different_facilities.csv')
-    df_facilities = df_facilities[["facname","latitude","longitude","facgroup","facsubgrp","factype"]]
-    df_facilities.rename(columns={"longitude": "Longitude", "latitude": "Latitude"}, inplace=True)
+    df_fac = pd.read_csv('data/facilities.csv')
+    df_fac = df_fac[["facname","latitude","longitude","facgroup","facsubgrp","factype"]]
+    df_fac.rename(columns={"longitude": "Longitude", "latitude": "Latitude"}, inplace=True)
     
     if facgroup is not None:
-        return df_facilities[df_facilities['facgroup'] == facgroup]
+        return df_fac[df_fac['facgroup'] == facgroup]
     elif facsubgrp is not None:
-        return df_facilities[df_facilities['facsubgrp'] == facsubgrp]
+        return df_fac[df_fac['facsubgrp'] == facsubgrp]
 
-    return df_facilities
-=======
-######################################
->>>>>>> Stashed changes
+    return df_fac
+
+
+

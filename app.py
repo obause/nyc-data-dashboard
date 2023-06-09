@@ -65,11 +65,11 @@ marker_style_squirrels = dict(
             opacity=1
 )
 
-marker_style_hospitals = dict(
-            size=8,
-            color='rgb(0, 0, 255)',
-            opacity=1
-)
+#marker_style_hospitals = dict(
+#            size=8,
+#            color='rgb(0, 0, 255)',
+#            opacity=1
+#)
 
 marker_style_cars = dict(
             size=6,
@@ -89,37 +89,193 @@ marker_style_hist_sites = dict(
             opacity=1
 )
 
+marker_style_colleges = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_youth_services = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_camps = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_libraries = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_cult = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_hospitals = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_mental = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_residential = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_senior = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_soup = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_bus = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_railyards = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_ports = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_airports = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_fireservices = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_policeservices = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_court = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
+marker_style_detention = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
 data_dict = {
+    "nypd_precincts": {"color": "#2596be"},
     "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
     "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
-    "nypd_precincts": {"color": "#2596be"},
-    "community_districts": {"color": "#f8ff99"},
-    "air_pollution": {"colorscale": ['green', 'orange', 'red', 'red'], "zmin": 0, "zmax": 7,},
-    "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
-    "schools": {"marker_style": marker_style_schools, "text": "School"},
-    "parks": {"color": "#105200"},
+    "car_accidents": {"marker_style": marker_style_cars, "text": "Car Accident", "colorscale": 'Reds', "radius": 2},
+    "fireservices": {"marker_style": marker_style_fireservices, "text": "Fire Services", "colorscale": 'Reds', "radius": 2},
+    "policeservices": {"marker_style": marker_style_policeservices, "text": "Police Services", "colorscale": 'Reds', "radius": 2},
+    "court": {"marker_style": marker_style_court, "text": "Courthouses and Judical", "colorscale": 'Reds', "radius": 2},
+    "detention": {"marker_style": marker_style_detention, "text": "Detention and Correctional", "colorscale": 'Reds', "radius": 2},
+    
     "borough": {"color": "white"},
     "borough_labels": {"mode": "text", "type": "points"},
-    "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
-    "car_accidents": {"marker_style": marker_style_cars, "text": "Car Accident", "colorscale": 'Reds', "radius": 2},
+    "community_districts": {"color": "#f8ff99"},
+    "parks": {"color": "#105200"},
     "hist_sites": {"marker_style": marker_style_hist_sites, "text": "Historical Sites", "colorscale": 'Reds', "radius": 2},
+    "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
+    
+    "schools": {"marker_style": marker_style_schools, "text": "School"},
+    "colleges": {"marker_style": marker_style_colleges, "text": "Colleges or Universities", "colorscale": 'Reds', "radius": 2},
+    "youth_services": {"marker_style": marker_style_youth_services, "text": "Colleges or Universities", "colorscale": 'Reds', "radius": 2},
+    "camps": {"marker_style": marker_style_camps, "text": "Camps", "colorscale": 'Reds', "radius": 2},
+    
+    "libraries": {"marker_style": marker_style_libraries, "text": "Libraries", "colorscale": 'Reds', "radius": 2},
+    "cult": {"marker_style": marker_style_cult, "text": "Cultural Institutions", "colorscale": 'Reds', "radius": 2},
+    
+    "air_pollution": {"colorscale": ['green', 'orange', 'red', 'red'], "zmin": 0, "zmax": 7,},
+    "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospitals and Clinics", "colorscale": 'Reds', "radius": 2},
+    "mental": {"marker_style": marker_style_mental, "text": "Mental Health", "colorscale": 'Reds', "radius": 2},
+    "residential": {"marker_style": marker_style_residential, "text": "Residential Health Care", "colorscale": 'Reds', "radius": 2},
+    "senior": {"marker_style": marker_style_senior, "text": "Senior Services", "colorscale": 'Reds', "radius": 2},
+    "soup": {"marker_style": marker_style_soup, "text": "Soup Kitchens and Food Pantries", "colorscale": 'Reds', "radius": 2},
+    
+    "bus": {"marker_style": marker_style_bus, "text": "Bus Depots and Terminals", "colorscale": 'Reds', "radius": 2},
+    "railyards": {"marker_style": marker_style_railyards, "text": "Rail Yards and Maintenance", "colorscale": 'Reds', "radius": 2},
+    "ports": {"marker_style": marker_style_ports, "text": "Ports and Ferry Landings", "colorscale": 'Reds', "radius": 2},
+    "airports": {"marker_style": marker_style_airports, "text": "Airports and Helicopters", "colorscale": 'Reds', "radius": 2},
+    
+    #"hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
 
 }
 
 filter_options = {
-    "shootings": {"name": "Shootings", "category": "Crime", "type": "points"},
-    "arrests": {"name": "Arrests", "category": "Crime", "type": "density"},
-    "nypd_precincts": {"name": "NYPD Precincts", "category": "Crime", "type": "polygons"},
-    "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
-    "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "choropleth"},
-    "hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
-    "schools": {"name": "Schools", "category": "Education and Youth", "type": "points"},
-    "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
+    "nypd_precincts": {"name": "NYPD Precincts", "category": "Public Safety, Emergency Services and Justice", "type": "polygons"},
+    "shootings": {"name": "Shootings", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    "arrests": {"name": "Arrests", "category": "Public Safety, Emergency Services and Justice", "type": "density"},
+    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "density" },
+    "fireservices": {"name": "Fire Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    "policeservices": {"name": "Police Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    "court": {"name": "Courthouses and Judical", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    "detention": {"name": "Detention and Correctional", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    
     "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
     "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
-    "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
-    "car_accidents": {"name": "Car Accidents", "category": "Crime", "type": "density" },
+    "community_districts": {"name": "Community Districts", "category": "Environment", "type": "polygons"},
+    "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
     "hist_sites":{"name": "Historical Sites", "category": "Environment", "type": "points" },
+    "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
+    
+    "schools": {"name": "Schools", "category": "Education and Youth", "type": "points"},
+    "colleges":{"name": "Colleges or Universities", "category": "Education and Youth", "type": "points" },
+    "youth_services":{"name": "Youth Services", "category": "Education and Youth", "type": "points" },
+    "camps":{"name": "Camps", "category": "Education and Youth", "type": "points" },
+    
+    "libraries":{"name": "Libraries", "category": "Libraries and Cultural Programs", "type": "points" },
+    "cult":{"name": "Cultural Institutions", "category": "Libraries and Cultural Programs", "type": "points" },
+    
+    "air_pollution": {"name": "Air Pollution", "category": "Health and Human Services", "type": "choropleth"},
+    "hospitals":{"name": "Hospitals and Clinics", "category": "Health and Human Services", "type": "points" },
+    "mental":{"name": "Mental Health", "category": "Health and Human Services", "type": "points" },
+    "residential":{"name": "Residential Health Care", "category": "Health and Human Services", "type": "points" },
+    "senior":{"name": "Senior Services", "category": "Health and Human Services", "type": "points" },
+    "soup":{"name": "Soup Kitchens and Food Pantries", "category": "Health and Human Services", "type": "points" },
+    
+    "bus":{"name": "Bus Depots and Terminals", "category": "Transportation", "type": "points" },
+    "railyards":{"name": "Rail Yards and Maintenance", "category": "Transportation", "type": "points" },
+    "ports":{"name": "Ports and Ferry Landings", "category": "Transportation", "type": "points" },
+    "airports":{"name": "Airports and Helicopters", "category": "Transportation", "type": "points" },
+    
+    #"hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
 }
 
 attributes = {
@@ -171,17 +327,86 @@ df_radar_2022, df_radar_2018, df_radar_2015 = get_measures_radar()
 df_stacked_2022, df_stacked_2018, df_stacked_2015 = get_measures_stacked()
 df_timeline = get_timeline()
 
-#df_school_loc = get_school_loc()
-#data_dict['schools']['data'] = df_school_loc
-#data_dict['schools']['text'] = df_school_loc['location_name']
-
-df_schools = get_facilities(facgroup ='SCHOOLS (K-12)')
+df_schools = get_facilities(facgroup = 'SCHOOLS (K-12)')
 data_dict['schools']['data'] = df_schools
 data_dict['schools']['text'] = df_schools['facname'] 
+
+df_colleges = get_facilities(facsubgrp = 'COLLEGES OR UNIVERSITIES')
+data_dict['colleges']['data'] = df_colleges
+data_dict['colleges']['text'] = df_colleges['facname'] 
 
 df_hist_sites = get_facilities(facsubgrp = 'HISTORICAL SITES')
 data_dict['hist_sites']['data'] = df_hist_sites
 data_dict['hist_sites']['text'] = df_hist_sites['facname'] 
+
+df_youth_services = get_facilities(facgroup = 'YOUTH SERVICES')
+data_dict['youth_services']['data'] = df_youth_services
+data_dict['youth_services']['text'] = df_youth_services['facname'] 
+
+df_camps = get_facilities(facgroup = 'CAMPS')
+data_dict['camps']['data'] = df_camps
+data_dict['camps']['text'] = df_camps['facname'] 
+
+df_libraries = get_facilities(facgroup = 'LIBRARIES')
+data_dict['libraries']['data'] = df_libraries
+data_dict['libraries']['text'] = df_libraries['facname'] 
+
+df_cult = get_facilities(facgroup = 'CULTURAL INSTITUTIONS')
+data_dict['cult']['data'] = df_cult
+data_dict['cult']['text'] = df_cult['facname'] 
+
+df_hospitals = get_facilities(facsubgrp = 'HOSPITALS AND CLINICS')
+data_dict['hospitals']['data'] = df_hospitals
+data_dict['hospitals']['text'] = df_hospitals['facname'] 
+
+df_mental = get_facilities(facsubgrp = 'MENTAL HEALTH')
+data_dict['mental']['data'] = df_mental
+data_dict['mental']['text'] = df_mental['facname'] 
+
+df_residential = get_facilities(facsubgrp = 'RESIDENTIAL HEALTH CARE')
+data_dict['residential']['data'] = df_residential
+data_dict['residential']['text'] = df_residential['facname'] 
+
+df_senior = get_facilities(facsubgrp = 'SENIOR SERVICES')
+data_dict['senior']['data'] = df_senior
+data_dict['senior']['text'] = df_senior['facname'] 
+
+df_soup = get_facilities(facsubgrp = 'SOUP KITCHENS AND FOOD PANTRIES')
+data_dict['soup']['data'] = df_soup
+data_dict['soup']['text'] = df_soup['facname'] 
+
+df_bus = get_facilities(facsubgrp = 'BUS DEPOTS AND TERMINALS')
+data_dict['bus']['data'] = df_bus
+data_dict['bus']['text'] = df_bus['facname'] 
+
+df_railyards = get_facilities(facsubgrp = 'RAIL YARDS AND MAINTENANCE')
+data_dict['railyards']['data'] = df_railyards
+data_dict['railyards']['text'] = df_railyards['facname']
+
+df_ports = get_facilities(facsubgrp = 'PORTS AND FERRY LANDINGS')
+data_dict['ports']['data'] = df_ports
+data_dict['ports']['text'] = df_ports['facname']
+
+df_airports = get_facilities(facsubgrp = 'AIRPORTS AND HELIPORTS')
+data_dict['airports']['data'] = df_airports
+data_dict['airports']['text'] = df_airports['facname']
+
+df_fireservices = get_facilities(facsubgrp = 'FIRE SERVICES')
+data_dict['fireservices']['data'] = df_fireservices
+data_dict['fireservices']['text'] = df_fireservices['facname']
+
+df_policeservices = get_facilities(facsubgrp = 'POLICE SERVICES')
+data_dict['policeservices']['data'] = df_policeservices
+data_dict['policeservices']['text'] = df_policeservices['facname']
+
+df_court = get_facilities(facsubgrp = 'COURTHOUSES AND JUDICIAL')
+data_dict['court']['data'] = df_court
+data_dict['court']['text'] = df_court['facname']
+
+df_detention = get_facilities(facsubgrp = 'DETENTION AND CORRECTIONAL')
+data_dict['detention']['data'] = df_detention
+data_dict['detention']['text'] = df_detention['facname']
+
 
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
@@ -556,7 +781,7 @@ app.layout = dbc.Container([
         dbc.Col([
             html.Br(),
             html.Label('Category'),
-            dcc.Dropdown(['Environment', 'Social/Health', 'Crime','Education and Youth'],
+            dcc.Dropdown(['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation'],
                          ['Environment'],
                          multi=True,
                          id='map-category'
