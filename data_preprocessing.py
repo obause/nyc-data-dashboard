@@ -194,3 +194,15 @@ def get_school_loc():
     df_school_loc = pd.read_csv('data/school_locations_2019_2020.csv')
     df_school_loc.rename(columns={"LONGITUDE": "Longitude", "LATITUDE": "Latitude"}, inplace=True)
     return df_school_loc
+
+def get_facilities(facgroup = None, facsubgrp = None):
+    df_facilities = pd.read_csv('data/different_facilities.csv')
+    df_facilities = df_facilities[["facname","latitude","longitude","facgroup","facsubgrp","factype"]]
+    df_facilities.rename(columns={"longitude": "Longitude", "latitude": "Latitude"}, inplace=True)
+    
+    if facgroup is not None:
+        return df_facilities[df_facilities['facgroup'] == facgroup]
+    elif facsubgrp is not None:
+        return df_facilities[df_facilities['facsubgrp'] == facsubgrp]
+
+    return df_facilities

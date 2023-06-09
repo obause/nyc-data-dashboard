@@ -83,6 +83,12 @@ marker_style_schools = dict(
             opacity=1
 )
 
+marker_style_hist_sites = dict(
+            size=6,
+            color='yellow',
+            opacity=1
+)
+
 data_dict = {
     "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
     "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
@@ -96,6 +102,8 @@ data_dict = {
     "borough_labels": {"mode": "text", "type": "points"},
     "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
     "car_accidents": {"marker_style": marker_style_cars, "text": "Car Accident", "colorscale": 'Reds', "radius": 2},
+    "hist_sites": {"marker_style": marker_style_hist_sites, "text": "Historical Sites", "colorscale": 'Reds', "radius": 2},
+
 }
 
 filter_options = {
@@ -105,12 +113,13 @@ filter_options = {
     "community_districts": {"name": "Community Districts", "category": "Social/Health", "type": "polygons"},
     "air_pollution": {"name": "Air Pollution", "category": "Social/Health", "type": "choropleth"},
     "hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
-    "schools": {"name": "Schools", "category": "Social/Health", "type": "points"},
+    "schools": {"name": "Schools", "category": "Education and Youth", "type": "points"},
     "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
     "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
     "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
     "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
     "car_accidents": {"name": "Car Accidents", "category": "Crime", "type": "density" },
+    "hist_sites":{"name": "Historical Sites", "category": "Environment", "type": "points" },
 }
 
 # Data loading and preprocessing
@@ -160,10 +169,17 @@ df_radar_2022, df_radar_2018, df_radar_2015 = get_measures_radar()
 df_stacked_2022, df_stacked_2018, df_stacked_2015 = get_measures_stacked()
 df_timeline = get_timeline()
 
-df_school_loc = get_school_loc()
-data_dict['schools']['data'] = df_school_loc
-data_dict['schools']['text'] = df_school_loc['location_name']
+#df_school_loc = get_school_loc()
+#data_dict['schools']['data'] = df_school_loc
+#data_dict['schools']['text'] = df_school_loc['location_name']
 
+df_schools = get_facilities(facgroup ='SCHOOLS (K-12)')
+data_dict['schools']['data'] = df_schools
+data_dict['schools']['text'] = df_schools['facname'] 
+
+df_hist_sites = get_facilities(facsubgrp = 'HISTORICAL SITES')
+data_dict['hist_sites']['data'] = df_hist_sites
+data_dict['hist_sites']['text'] = df_hist_sites['facname'] 
 
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
@@ -501,7 +517,7 @@ app.layout = dbc.Container([
         dbc.Col([
             html.Br(),
             html.Label('Category'),
-            dcc.Dropdown(['Environment', 'Social/Health', 'Crime'],
+            dcc.Dropdown(['Environment', 'Social/Health', 'Crime','Education and Youth'],
                          ['Environment'],
                          multi=True,
                          id='map-category'
