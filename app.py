@@ -5,7 +5,7 @@ import datetime
 import json
 import logging
 
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
 
 import numpy as np
@@ -122,6 +122,11 @@ filter_options = {
     "hist_sites":{"name": "Historical Sites", "category": "Environment", "type": "points" },
 }
 
+attributes = {
+    "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
+    "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'}
+}
+
 # Data loading and preprocessing
 borough_mapping = get_borough_mappings()
 
@@ -148,9 +153,6 @@ data_dict['hospitals']['text'] = hospitals['Facility Name']
 car_accidents = get_car_accident_data()
 data_dict['car_accidents']['data'] = car_accidents
 data_dict['car_accidents']['text'] = car_accidents['CONTRIBUTING FACTOR VEHICLE 1']
-
-air_quality_geo = get_air_quality_data()
-data_dict['air_pollution']['data'] = air_quality_geo
 
 nyc_borough_geo = get_borough_geodata()
 data_dict['borough']['data'] = nyc_borough_geo
@@ -358,6 +360,44 @@ def update_map(filter_values):
         )
     return fig_map
 
+
+@app.callback(
+    Output('map-click-data', 'children'),
+    Input('map', 'clickData'),
+    State('map-filter', 'value'))
+def display_click_data(clickData, state):
+    print("clickData: ", clickData)
+    print("state: ", state)
+    
+    if clickData is None:
+        return "nothing selected"
+    
+    curve_number = clickData['points'][0]['curveNumber']
+    point_number = clickData['points'][0]['pointNumber']
+    
+    for i in state:
+        if filter_options[i]['type'] == 'polygons':
+            state.remove(i)
+    
+    selected_dataset = state[curve_number-1]
+    
+    point_data = data_dict[selected_dataset]['data'].iloc[point_number]
+
+    attributes_list = attributes.get(selected_dataset)
+    if attributes_list is not None:
+        selected_attributes = attributes_list.keys()
+    else:
+        attributes_list = {i: i for i in point_data.keys()}
+        selected_attributes = point_data.keys()
+    
+    print("attributes_list: ", attributes_list)
+    
+    content = dash_table.DataTable(
+        columns=[{"name": 'attribute', "id": 'attribute'}, {"name": 'value', "id": 'value'}],
+        data=[{'attribute': attributes_list[col], 'value': value} for col, value in point_data.items() if col in selected_attributes]
+    )
+    return content #json.dumps(clickData, indent=2)
+
 @app.callback(
     Output("graph", "figure"),
     Input("dropdown", "value")
@@ -469,7 +509,6 @@ def update_radar(selected_year):
 
 
 
-
 markdown_text = '''
 ##### Dash and Markdown
 
@@ -531,12 +570,21 @@ app.layout = dbc.Container([
             ),    
         ]), #style={'padding': 10, 'flex': 1})
     ]), #style={'display': 'flex', 'flex-direction': 'row'}),
-    dbc.Row(
-        dcc.Graph(
-            id='map',
-            figure=fig_map
-        ),    
-    ),
+    dbc.Row([
+        dbc.Col(
+            dcc.Graph(
+                id='map',
+                figure=fig_map
+            ),
+            width=10
+        ),
+        dbc.Col([
+            html.H3("Detailed Information"),
+            html.H6("Click on any data point to show detailed information about this point"),
+            html.Div(id='map-click-data'),
+        ], width=2),
+            
+    ]),
     dbc.Row(
         dbc.Col(
             dcc.Graph(id="graph")

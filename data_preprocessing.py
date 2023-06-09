@@ -42,6 +42,7 @@ def get_crime_arrests(truncated=True):
     nypd_arrests['year'] = date[2].astype('int32')
     nypd_arrests['day'] = date[1].astype('int32')
     nypd_arrests['month'] = date[0].astype('int32')
+    nypd_arrests['ARREST_DATE'] = f"{nypd_arrests['day']}.{nypd_arrests['month']}.{nypd_arrests['year']}"
     return nypd_arrests
     
 def get_crime_shootings(year=2022):
@@ -49,6 +50,7 @@ def get_crime_shootings(year=2022):
     nypd_shootings['OCCUR_DATE'] = pd.to_datetime(nypd_shootings['OCCUR_DATE'])
     nypd_shootings['YEAR'] = pd.DatetimeIndex(nypd_shootings['OCCUR_DATE']).year
     nypd_shootings = nypd_shootings[nypd_shootings['YEAR'] == year]
+    nypd_shootings['OCCUR_DATE'] = nypd_shootings['OCCUR_DATE'].dt.strftime('%d.%m.%Y')
     return nypd_shootings
 
 def get_nyc_borough_indicators():
@@ -76,7 +78,7 @@ def get_car_accident_data():
     car_accidents = pd.read_csv('data/crime/car_accidents_2022.csv')
     return car_accidents
 
-def get_air_quality_data(measure_name='Fine Particulate Matter (PM2.5)', time_period='Annual Average 2020'):
+def get_air_quality_data(measure_name, time_period='Annual Average 2020'):
     air_quality = pd.read_csv("data/social/NYCgov_Air_Quality.csv")
     air_quality = air_quality[air_quality['Name'] == measure_name]
     nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
