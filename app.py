@@ -4,9 +4,12 @@ import time
 import datetime
 import json
 import logging
+import dash
 
 from dash import Dash, dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
+#from dash_bootstrap_templates import load_figure_template
+#load_figure_template('LUX')
 
 import numpy as np
 import pandas as pd
@@ -40,9 +43,9 @@ styles = {
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
-#app = Dash(__name__, external_stylesheets=external_stylesheets)
-app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
-#server = app.server
+#bs = 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY]) #dbc.themes.CYBORG
+
 
 
 
