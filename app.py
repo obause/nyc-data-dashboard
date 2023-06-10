@@ -4,7 +4,7 @@ import time
 import datetime
 import json
 import logging
-import dash
+#import dash
 
 from dash import Dash, dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
@@ -44,7 +44,7 @@ styles = {
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
 #bs = 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY]) #dbc.themes.CYBORG
+app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG]) #dbc.themes.CYBORG
 
 
 
