@@ -50,9 +50,9 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG]) #dbc.themes.CYBOR
 
 
 marker_style_shooting = dict(
-            size=8,
-            color='rgb(255, 0, 0)',
-            opacity=0.8
+            size=6,
+            color='#9E1030',
+            opacity=1
         )    
 
 marker_style_arrests = dict(
@@ -82,121 +82,121 @@ marker_style_cars = dict(
 
 marker_style_schools = dict(
             size=6,
-            color='yellow',
+            color='#EFC050',
             opacity=1
 )
 
 marker_style_hist_sites = dict(
             size=6,
-            color='yellow',
+            color='#45B8AC',
             opacity=1
 )
 
 marker_style_colleges = dict(
             size=6,
-            color='yellow',
+            color='#955251',
             opacity=1
 )
 
 marker_style_youth_services = dict(
             size=6,
-            color='yellow',
+            color='#B565A7',
             opacity=1
 )
 
 marker_style_camps = dict(
             size=6,
-            color='yellow',
+            color='#009B77',
             opacity=1
 )
 
 marker_style_libraries = dict(
             size=6,
-            color='yellow',
+            color='#D65076',
             opacity=1
 )
 
 marker_style_cult = dict(
             size=6,
-            color='yellow',
+            color='#5B5EA6',
             opacity=1
 )
 
 marker_style_hospitals = dict(
             size=6,
-            color='yellow',
+            color='#FFD662',
             opacity=1
 )
 
 marker_style_mental = dict(
             size=6,
-            color='yellow',
+            color='#DFCFBE',
             opacity=1
 )
 
 marker_style_residential = dict(
             size=6,
-            color='yellow',
+            color='#B55A30',
             opacity=1
 )
 
 marker_style_senior = dict(
             size=6,
-            color='yellow',
+            color='#A0DAA9',
             opacity=1
 )
 
 marker_style_soup = dict(
             size=6,
-            color='yellow',
+            color='#755139',
             opacity=1
 )
 
 marker_style_bus = dict(
             size=6,
-            color='yellow',
+            color='#363945',
             opacity=1
 )
 
 marker_style_railyards = dict(
             size=6,
-            color='yellow',
+            color='#939597',
             opacity=1
 )
 
 marker_style_ports = dict(
             size=6,
-            color='yellow',
+            color='#E0B589',
             opacity=1
 )
 
 marker_style_airports = dict(
             size=6,
-            color='yellow',
+            color='#BFD641',
             opacity=1
 )
 
 marker_style_fireservices = dict(
             size=6,
-            color='yellow',
+            color='#FF6F61',
             opacity=1
 )
 
 marker_style_policeservices = dict(
             size=6,
-            color='yellow',
+            color='#00758F',
             opacity=1
 )
 
 marker_style_court = dict(
             size=6,
-            color='yellow',
+            color='#6B5876',
             opacity=1
 )
 
 marker_style_detention = dict(
             size=6,
-            color='yellow',
+            color='#282D3C',
             opacity=1
 )
 
@@ -288,6 +288,7 @@ filter_options = {
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'}
+
 }
 
 # Data loading and preprocessing
@@ -760,6 +761,7 @@ if this is your first introduction to Markdown!
 # App layout
 app.layout = dbc.Container([
     dbc.Row(
+        
         html.H1(
             children='New York Smart City Dashboard',
             style={
@@ -767,8 +769,10 @@ app.layout = dbc.Container([
                 'color': COLORS['text']
             }
         ),
+        
     ),
     dbc.Row(
+        
         html.P(
             children='by Ole Bause and Alexander Barkov',
             style={
@@ -776,7 +780,8 @@ app.layout = dbc.Container([
                 'color': COLORS['text']
                 },
            className='lead'
-        ),      
+        ), 
+        
     ),
     
     dbc.Row([
@@ -850,7 +855,7 @@ app.layout = dbc.Container([
                         {"label": "2023", "value": 2023},
                     ],
                     value=20,
-                ), width={"size": 2, "offset": 0}
+                ), width={"size": 2, "offset": 6}
             ),
         ], className="mt-4",
     ),
