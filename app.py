@@ -128,6 +128,7 @@ data_dict['nypd_precincts']['data'] = nypd_precincts_geo
 community_districts_geo = get_community_districts_geodata()
 data_dict['community_districts']['data'] = community_districts_geo
 
+
 nyc_crime_shootings = get_crime_shootings()
 data_dict['shootings']['data'] = nyc_crime_shootings
 nyc_crime_arrests = get_crime_arrests()
@@ -205,6 +206,29 @@ fig_map.update_layout(
     paper_bgcolor=COLORS['background'],
     font_color=COLORS['text']
 )
+
+
+community_districts_geodf = get_community_districts_geodf()
+fig_cd_map = go.Figure(go.Scattermapbox())
+fig_cd_map.add_trace(go.Scattermapbox(
+                    lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
+                    text=community_districts_geodf['displayname'],
+                    mode='text',
+                ))
+fig_cd_map.update_layout(
+    mapbox = {
+            'accesstoken': mapbox_access_token,
+            #'style': "stamen-terrain",
+            'center': { 'lon': -73.935242, 'lat': 40.730610},
+            'zoom': 10, 
+            'layers': [{
+                'source': community_districts_geo,
+                'type': "fill", 'below': "traces", 'color': "green", 'opacity': 0.5
+                }],
+        },
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+        height=800,
+    )
 
 indicators = get_nyc_borough_indicators()
 categories = [
@@ -622,6 +646,30 @@ app.layout = dbc.Container([
             ), width={"size": 5, "offset": 4}
         )
     ),
+    
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(
+                id='cd-map',
+                figure=fig_cd_map
+            ),
+            
+        ], width=4),
+        dbc.Col([
+            html.Br(),
+            html.Label('Category'),
+            dcc.Dropdown(community_districts_geodf['displayname'].unique().tolist(),
+                         #['Environment'],
+                         #multi=True,
+                         id='community-district'
+                         ), #style={'padding': 10, 'flex': 1}  
+            dcc.Graph(
+                id='cd-demographics',
+                #figure=fig_cd_map
+            ),
+        ], width=4),
+        dbc.Col([], width=4),
+    ]),
     
     ],fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
 

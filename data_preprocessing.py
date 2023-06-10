@@ -32,6 +32,9 @@ def get_borough_mappings():
     })
     return borough_mapping
 
+def calculate_centroids(gdf, geometry_column='geometry'):
+    gdf['Longitude'] = gdf[geometry_column].centroid.x
+    gdf['Latitude'] = gdf[geometry_column].centroid.y
 
 def get_crime_arrests(truncated=True):
     if truncated:
@@ -112,6 +115,18 @@ def get_community_districts_geodata():
     with open("data/reference_data/UHF42.geo.json") as f:
         nyc_uhf42_geo = json.load(f)
     return nyc_uhf42_geo
+
+def get_community_districts_geodf():
+    #nyc_cd = pd.read_csv("../data/reference_data/nycd.csv")
+    #nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
+    #gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
+    #gdf.drop('the_geom', axis=1, inplace=True)
+    gdf = gpd.read_file('data/reference_data/UHF42.geo.json')
+    #gdf = gdf.set_index('BoroCD')
+    gdf['Longitude'] = gdf['geometry'].centroid.x
+    gdf['Latitude'] = gdf['geometry'].centroid.y
+    gdf['displayname'] = [f'{a} <br> {b}' for a, b in zip(gdf["GEOCODE"], gdf["GEONAME"])]
+    return gdf
 
 def get_borough_geodata():
     with open("data/Borough_Boundaries.geojson") as f:
