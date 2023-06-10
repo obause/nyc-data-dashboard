@@ -211,6 +211,8 @@ data_dict = {
     "borough_labels": {"mode": "text", "type": "points"},
     "community_districts": {"color": "#f8ff99"},
     "parks": {"color": "#105200"},
+    "parking": {"color": "#808080"},
+    "hurricane": {"color": "#8A2BE2"},
     "hist_sites": {"marker_style": marker_style_hist_sites, "text": "Historical Sites", "colorscale": 'Reds', "radius": 2},
     "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
     
@@ -252,6 +254,8 @@ filter_options = {
     "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
     "community_districts": {"name": "Community Districts", "category": "Environment", "type": "polygons"},
     "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
+    "parking": {"name": "Parking Lots", "category": "Environment", "type": "polygons"},
+    "hurricane": {"name": "Hurricane Evacuation Zones", "category": "Environment", "type": "polygons"},
     "hist_sites":{"name": "Historical Sites", "category": "Environment", "type": "points" },
     "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
     
@@ -406,6 +410,12 @@ data_dict['court']['text'] = df_court['facname']
 df_detention = get_facilities(facsubgrp = 'DETENTION AND CORRECTIONAL')
 data_dict['detention']['data'] = df_detention
 data_dict['detention']['text'] = df_detention['facname']
+
+nypd_parking_geo = get_parking_geodata()
+data_dict['parking']['data'] = nypd_parking_geo
+
+nypd_hurricane_geo = get_hurricane_geodata()
+data_dict['hurricane']['data'] = nypd_hurricane_geo
 
 
 
@@ -631,13 +641,13 @@ def update_line_chart(selected_year):
     df = df_timeline
     
     if selected_year == 20:
-        fig = px.line(df, x="Date", y="Miete", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        fig = px.line(df, x="Date", y="Rent", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
         xaxis_label = 'Year'
         yaxis_label = 'Rent'
         
     else:
-        mask = df["Jahr"] == selected_year
-        fig = px.line(df[mask], x="Monate", y="Miete", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        mask = df["Year"] == selected_year
+        fig = px.line(df[mask], x="Month Names", y="Rent", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
         xaxis_label = 'Month'
         yaxis_label = 'Rent'
 

@@ -210,5 +210,16 @@ def get_facilities(facgroup = None, facsubgrp = None):
 
     return df_fac
 
+def get_parking_geodata():
+    with open('data/Parking.geojson') as f:
+        nypd_parking_geo = json.load(f)
+    return nypd_parking_geo
+
+def get_hurricane_geodata():
+    with open('data/Hurricane_Evac_Zones.geojson') as f:
+        nypd_hurricane_geo = json.load(f)
+    return nypd_hurricane_geo
+
+
 
 
