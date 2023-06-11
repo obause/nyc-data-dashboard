@@ -11,6 +11,7 @@ import dash_bootstrap_components as dbc
 #from dash_bootstrap_templates import load_figure_template
 #load_figure_template('LUX')
 import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 
 import numpy as np
 import pandas as pd
@@ -48,7 +49,7 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBORG
 
 
-
+map_categories = ['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation']
 
 marker_style_shooting = dict(
             size=6,
@@ -245,14 +246,14 @@ data_dict = {
 }
 
 filter_options = {
-    "nypd_precincts": {"name": "NYPD Precincts", "category": "Public Safety, Emergency Services and Justice", "type": "polygons"},
-    "shootings": {"name": "Shootings", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
-    "arrests": {"name": "Arrests", "category": "Public Safety, Emergency Services and Justice", "type": "density"},
-    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "points" },
-    "fireservices": {"name": "Fire Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
-    "policeservices": {"name": "Police Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
-    "court": {"name": "Courthouses and Judical", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
-    "detention": {"name": "Detention and Correctional", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
+    "nypd_precincts": {"name": "NYPD Precincts", "category": "Public Safety, Emergency Services and Justice", "type": "polygons", "icon": "map:police"},
+    "shootings": {"name": "Shootings", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:pistol'},
+    "arrests": {"name": "Arrests", "category": "Public Safety, Emergency Services and Justice", "type": "density", 'icon': 'game-icons:handcuffs'},
+    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'tabler:car-crash'},
+    "fireservices": {"name": "Fire Services", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:fire-truck'},
+    "policeservices": {"name": "Police Services", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:police-station'},
+    "court": {"name": "Courthouses and Judical", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:court-hammer'},
+    "detention": {"name": "Detention and Correctional", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'game-icons:prisoner'},
     
     "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
     "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
@@ -496,7 +497,7 @@ fig_radar_bar = go.Figure(go.Bar())
 
 # Generate Filter Options
 @app.callback(
-    Output('map-filter', 'options'),
+    Output('map-filter', 'children'),
     Input('map-category', 'value'),
     State('map-filter', 'value'))
 def set_filter_options(selected_category, selected_filters):
@@ -508,20 +509,26 @@ def set_filter_options(selected_category, selected_filters):
         return options
     else:
         if selected_filters is not None:
-            options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
+            #options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
+            options += [dmc.Chip(filter_options[i]['name'], value=i, variant="outline") for i in selected_filters]
         #options += [{'label': 'All', 'value': 'All'}]
         for key, value in filter_options.items():
             if selected_category == value['category']:
-                options += [{'label': value['name'], 'value': key}]
-    
-    #elif len(selected_category) == 0:
-    #    return options
-    #elif len(selected_category) >= 1:
-    #    options += [{'label': 'All', 'value': 'All'}]
-    #    for cat in selected_category:
-    #        for key, value in filter_options.items():
-    #            if cat == value['category']:
-    #                options += [{'label': value['name'], 'value': key}]
+                #options += [{'label': value['name'], 'value': key}]
+                options.append(
+                    dmc.Chip([
+                        DashIconify(
+                            icon=value.get('icon', 'fa:circle'),
+                            width=17,
+                            height=17,
+                            inline=True,
+                            style={"marginRight": 5},),
+                        value['name'], 
+                        ],
+                        value=key, 
+                        variant="outline"
+                        )
+                    )
 
     return options
 
@@ -570,6 +577,7 @@ def update_map(filter_values):
                     marker = data_dict[filter_value].get('marker_style'),
                     text=data_dict[filter_value].get('text'),
                     mode=data_dict[filter_value].get('mode', 'markers'),
+                    name=data_dict[filter_value].get('name'),
                 ))
                 
             elif filter_options[filter_value]['type'] == 'density':
@@ -581,6 +589,7 @@ def update_map(filter_values):
                     colorscale=data_dict[filter_value].get('colorscale', 'hot'),
                     text=data_dict[filter_value].get('text'),
                     hovertext=data_dict[filter_value].get('text'),
+                    name=data_dict[filter_value].get('name'),
                     ))
                 
             elif filter_options[filter_value]['type'] == 'choropleth':
@@ -597,6 +606,7 @@ def update_map(filter_values):
                     zmax=values.min(),
                     colorscale=data_dict[filter_value].get('colorscale', 'hot'),
                     marker_opacity=0.5, marker_line_width=0,
+                    name=data_dict[filter_value].get('name'),
                     ))
     
     mapbox_dict = {
@@ -830,61 +840,33 @@ app.layout = dbc.Container([
                 }
             ),    
         ]),
-        dbc.Row([
-            dbc.Col([
-                html.Br(),
-                html.Label('Category'),
-                dcc.Dropdown(['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation'],
-                            #['Environment'],
-                            #multi=True,
-                            id='map-category'
-                            ), #style={'padding': 10, 'flex': 1}  
-            ]),
-            dbc.Col([
-                html.Label('Filter'),
-                
-                dcc.Checklist(
-                    id='map-filter',
-                    inline=True,
-                    className='checklist'
-                    ),   
-                    
-                 
-            ]), #style={'padding': 10, 'flex': 1})
-        ]), #style={'display': 'flex', 'flex-direction': 'row'}),
         
         dbc.Row([
             dbc.Col([
-                html.Br(),
-                html.Label('Category'),
                 dmc.Select(
                     label="Select category",
                     placeholder="Select one",
-                    id="framework-select",
+                    id="map-category",
                     value="ng",
-                    data=[
-                        {"value": "environment", "label": "Environment"},
-                    ],
-                    style={"width": 200, "marginBottom": 10},
+                    data=[{'value': i, 'label': i} for i in map_categories],
+                    clearable=True,
+                    icon=DashIconify(icon="bxs:category"),
+                    style={"width": 400, "marginBottom": 10},
                 ),
-            ]),
+            ], width=4),
             dbc.Col([
-                dmc.CheckboxGroup(
-                    id="map-filter2",
-                    label="Select a filter",
-                    description="This is anonymous",
-                    orientation="horizontal",
-                    offset="md",
-                    mb=10,
-                    children=[
-                        dmc.Checkbox(label="Test", value="test"),
-                    ],
-                    #value=["react", "vue"],
+                dmc.Text("Select a filter", weight=500),
+                dmc.ChipGroup(
+                    id="map-filter",
+                    multiple=True,
+                    #label="Select a filter",
+                    #description="This is anonymous",
+                    #orientation="horizontal",
+                    #offset="md",
+                    #mb=10,
                 ),
-                dmc.Text(id="checkbox-group-output"),
-                    
-                 
-            ]), #style={'padding': 10, 'flex': 1})
+                dmc.Text(id="chips-values-output"),
+            ], width=8), #style={'padding': 10, 'flex': 1})
         ]), #style={'display': 'flex', 'flex-direction': 'row'}),
         
         dbc.Row([
