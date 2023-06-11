@@ -44,7 +44,7 @@ styles = {
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
 #bs = 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'
-app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG]) #dbc.themes.CYBORG
+app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBORG
 
 
 
@@ -247,7 +247,7 @@ filter_options = {
     "nypd_precincts": {"name": "NYPD Precincts", "category": "Public Safety, Emergency Services and Justice", "type": "polygons"},
     "shootings": {"name": "Shootings", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
     "arrests": {"name": "Arrests", "category": "Public Safety, Emergency Services and Justice", "type": "density"},
-    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "density" },
+    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "points" },
     "fireservices": {"name": "Fire Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
     "policeservices": {"name": "Police Services", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
     "court": {"name": "Courthouses and Judical", "category": "Public Safety, Emergency Services and Justice", "type": "points"},
@@ -496,20 +496,31 @@ fig_radar_bar = go.Figure(go.Bar())
 # Generate Filter Options
 @app.callback(
     Output('map-filter', 'options'),
-    Input('map-category', 'value'))
-def set_filter_options(selected_category):
+    Input('map-category', 'value'),
+    State('map-filter', 'value'))
+def set_filter_options(selected_category, selected_filters):
     print("Selected category: ", selected_category)
     
     #return [{'label': i, 'value': i} for i in filter_options[selected_category]].keys() + [{'label': 'All', 'value': 'All'}]
     options = []
-    if len(selected_category) == 0:
+    if selected_category is None:
         return options
-    elif len(selected_category) >= 1:
-        options += [{'label': 'All', 'value': 'All'}]
-        for cat in selected_category:
-            for key, value in filter_options.items():
-                if cat == value['category']:
-                    options += [{'label': value['name'], 'value': key}]
+    else:
+        if selected_filters is not None:
+            options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
+        #options += [{'label': 'All', 'value': 'All'}]
+        for key, value in filter_options.items():
+            if selected_category == value['category']:
+                options += [{'label': value['name'], 'value': key}]
+    
+    #elif len(selected_category) == 0:
+    #    return options
+    #elif len(selected_category) >= 1:
+    #    options += [{'label': 'All', 'value': 'All'}]
+    #    for cat in selected_category:
+    #        for key, value in filter_options.items():
+    #            if cat == value['category']:
+    #                options += [{'label': value['name'], 'value': key}]
 
     return options
 
@@ -584,18 +595,21 @@ def update_map(filter_values):
                     zmin=values.min(),
                     zmax=values.min(),
                     colorscale=data_dict[filter_value].get('colorscale', 'hot'),
-                    marker_opacity=0.5, marker_line_width=0
+                    marker_opacity=0.5, marker_line_width=0,
                     ))
-                
-    fig_map.update_layout(
-        mapbox = {
+    
+    mapbox_dict = {
             'accesstoken': mapbox_access_token,
             #'style': "stamen-terrain",
             'center': center,
-            'zoom': zoom, 'layers': layers},
+            'zoom': zoom, 'layers': layers}
+    
+    fig_map.update_layout(
+        mapbox = mapbox_dict,
         margin = {'l':0, 'r':0, 'b':0, 't':0},
         height=800,
         transition_duration=500,
+        showlegend=False
         )
     return fig_map
 
@@ -644,20 +658,36 @@ def display_click_data(clickData, state):
 def update_line_chart(selected_year):
     df = df_timeline
     
+    fig = go.Figure()
+    
     if selected_year == 20:
-        fig = px.line(df, x="Date", y="Rent", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        df_filtered = df
+        x_axis = 'Date'
         xaxis_label = 'Year'
         yaxis_label = 'Rent'
-        
     else:
         mask = df["Year"] == selected_year
-        fig = px.line(df[mask], x="Month Names", y="Rent", color='Borough', title='Average Rent Prices Of 1 Bedroom Apartments')
+        df_filtered = df[mask]
+        x_axis = 'Month Names'
         xaxis_label = 'Month'
         yaxis_label = 'Rent'
 
-    fig.update_yaxes(range=[500, 4500]) 
-    fig.update_traces(connectgaps=True, selector=dict(type='line'))
+    for borough in df_filtered['Borough'].unique():
+        df_filtered_borough = df_filtered[df_filtered['Borough'] == borough]
+        linewidth = 1
+        if borough == 'New York City':
+            linewidth = 4
+        fig.add_trace(go.Scatter(
+            x=df_filtered_borough[x_axis], 
+            y=df_filtered_borough["Rent"], 
+            name=borough, 
+            mode='lines',
+            connectgaps=True,
+            line=dict(width=linewidth)
+            ))
+        
     fig.update_layout(
+        title="Average Rent Prices Of 1 Bedroom Apartments",
         xaxis_title = xaxis_label,  
         yaxis_title = yaxis_label,
         title_x=0.5
@@ -760,129 +790,137 @@ if this is your first introduction to Markdown!
 
 # App layout
 app.layout = dbc.Container([
-    dbc.Row(
+    dbc.Container([
         
-        html.H1(
-            children='New York Smart City Dashboard',
-            style={
-                'textAlign': 'center',
-                'color': COLORS['text']
-            }
-        ),
-        
-    ),
-    dbc.Row(
-        
-        html.P(
-            children='by Ole Bause and Alexander Barkov',
-            style={
-                'textAlign': 'center',
-                'color': COLORS['text']
-                },
-           className='lead'
-        ), 
-        
-    ),
-    
-    dbc.Row([
-        html.Hr(),
-
-        html.H3(
-            children='Map of NYC',
-            style={
-                'textAlign': 'center',
-                'color': COLORS['text']
-            }
-        ),    
-    ]),
-    dbc.Row([
-        dbc.Col([
-            html.Br(),
-            html.Label('Category'),
-            dcc.Dropdown(['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation'],
-                         ['Environment'],
-                         multi=True,
-                         id='map-category'
-                         ), #style={'padding': 10, 'flex': 1}  
-        ]),
-        dbc.Col([
-            html.Label('Filter'),
-            dcc.Checklist(
-                        id='map-filter',
-                        inline=True
-            ),    
-        ]), #style={'padding': 10, 'flex': 1})
-    ]), #style={'display': 'flex', 'flex-direction': 'row'}),
-    dbc.Row([
-        dbc.Col(
-            dcc.Graph(
-                id='map',
-                figure=fig_map
+        dbc.Row([
+            html.Img(src=app.get_asset_url('images/new-york-city-skyline-silhouette.png'), className='logo'),
+            html.H1(
+                children='New York Smart City Dashboard',
+                style={
+                    'textAlign': 'center',
+                    #'color': COLORS['text']
+                }
             ),
-            width=10
-        ),
-        dbc.Col([
-            html.H3("Detailed Information"),
-            html.H6("Click on any data point to show detailed information about this point"),
-            html.Div(id='map-click-data'),
-        ], width=2),
             
-    ]),
-    dbc.Row(
-        dbc.Col(
-            dcc.Graph(id="graph")
-        )
-    ),
-    dbc.Row([
+        ]),
+        dbc.Row(
+            
+            html.P(
+                children='by Ole Bause and Alexander Barkov',
+                style={
+                    'textAlign': 'center',
+                    #'color': COLORS['text']
+                    },
+            className='subtitle'
+            ), 
+            
+        ),
+    ], class_name="title-bar", fluid=True),
+    dbc.Container([
+    
+        dbc.Row([
+            html.Hr(),
+
+            html.H3(
+                children='Map of NYC',
+                style={
+                    'textAlign': 'center',
+                    'color': COLORS['text']
+                }
+            ),    
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Br(),
+                html.Label('Category'),
+                dcc.Dropdown(['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation'],
+                            #['Environment'],
+                            #multi=True,
+                            id='map-category'
+                            ), #style={'padding': 10, 'flex': 1}  
+            ]),
+            dbc.Col([
+                html.Label('Filter'),
+                dcc.Div(className='toggle-rect-dark', children=[
+                    dcc.Checklist(
+                        id='map-filter',
+                        inline=True,
+                        className='checklist'
+                        ),   
+                    ]),
+                 
+            ]), #style={'padding': 10, 'flex': 1})
+        ]), #style={'display': 'flex', 'flex-direction': 'row'}),
+        dbc.Row([
             dbc.Col(
-                dcc.Dropdown(
-                    id="dropdown",
-                    options=[
-                        {"label": "Complete Timeline", "value": 20},
-                        {"label": "2010", "value": 2010},
-                        {"label": "2011", "value": 2011},
-                        {"label": "2012", "value": 2012},
-                        {"label": "2013", "value": 2013},
-                        {"label": "2014", "value": 2014},
-                        {"label": "2015", "value": 2015},
-                        {"label": "2016", "value": 2016},
-                        {"label": "2017", "value": 2017},
-                        {"label": "2018", "value": 2018},
-                        {"label": "2019", "value": 2019},
-                        {"label": "2020", "value": 2020},
-                        {"label": "2021", "value": 2021},
-                        {"label": "2022", "value": 2022},
-                        {"label": "2023", "value": 2023},
-                    ],
-                    value=20,
-                ), width={"size": 2, "offset": 6}
+                dcc.Graph(
+                    id='map',
+                    figure=fig_map
+                ),
+                width=10
             ),
-        ], className="mt-4",
-    ),
-    
-    dbc.Row([
-        dbc.Col([
-            dcc.Graph(id="stacked")
-        ], width=6),
-        dbc.Col([
-            dcc.Graph(id="radar")
-        ], width=6),
-    ]),
-    dbc.Row(
-        dbc.Col(
-            dcc.Slider(1, 3, 1,
-                       value=2,
-                       id='slider',
-                       marks={
-                           1: {'label': '2015', 'style': {'color': '#77b0b1'}},
-                           2: {'label': '2018', 'style': {'color': '#77b0b1'}},
-                           3: {'label': '2022', 'style': {'color': '#77b0b1'}},
-                       }, included=False
-            ), width={"size": 5, "offset": 4}
-        )
-    ),
-    
-    ],fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
+            dbc.Col([
+                html.H3("Detailed Information"),
+                html.H6("Click on any data point to show detailed information about this point"),
+                html.Div(id='map-click-data'),
+            ], width=2),
+                
+        ]),
+        dbc.Row(
+            dbc.Col(
+                dcc.Graph(id="graph")
+            )
+        ),
+        dbc.Row([
+                dbc.Col(
+                    dcc.Dropdown(
+                        id="dropdown",
+                        options=[
+                            {"label": "Complete Timeline", "value": 20},
+                            {"label": "2010", "value": 2010},
+                            {"label": "2011", "value": 2011},
+                            {"label": "2012", "value": 2012},
+                            {"label": "2013", "value": 2013},
+                            {"label": "2014", "value": 2014},
+                            {"label": "2015", "value": 2015},
+                            {"label": "2016", "value": 2016},
+                            {"label": "2017", "value": 2017},
+                            {"label": "2018", "value": 2018},
+                            {"label": "2019", "value": 2019},
+                            {"label": "2020", "value": 2020},
+                            {"label": "2021", "value": 2021},
+                            {"label": "2022", "value": 2022},
+                            {"label": "2023", "value": 2023},
+                        ],
+                        value=20,
+                    ), width={"size": 2, "offset": 6}
+                ),
+            ], className="mt-4",
+        ),
+        
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id="stacked")
+            ], width=6),
+            dbc.Col([
+                dcc.Graph(id="radar")
+            ], width=6),
+        ]),
+        dbc.Row(
+            dbc.Col(
+                dcc.Slider(1, 3, 1,
+                        value=2,
+                        id='slider',
+                        marks={
+                            1: {'label': '2015', 'style': {'color': '#77b0b1'}},
+                            2: {'label': '2018', 'style': {'color': '#77b0b1'}},
+                            3: {'label': '2022', 'style': {'color': '#77b0b1'}},
+                        }, included=False
+                ), width={"size": 5, "offset": 4}
+            )
+        ),
+    ],fluid=True,),
+], class_name="main-container",fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
 
 
 
