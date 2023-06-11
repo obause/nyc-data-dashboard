@@ -10,6 +10,7 @@ from dash import Dash, dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
 #from dash_bootstrap_templates import load_figure_template
 #load_figure_template('LUX')
+import dash_mantine_components as dmc
 
 import numpy as np
 import pandas as pd
@@ -793,7 +794,7 @@ app.layout = dbc.Container([
     dbc.Container([
         
         dbc.Row([
-            html.Img(src=app.get_asset_url('images/new-york-city-skyline-silhouette.png'), className='logo'),
+            #html.Img(src=app.get_asset_url('images/new-york-city-skyline-silhouette.png'), className='logo'),
             html.H1(
                 children='New York Smart City Dashboard',
                 style={
@@ -841,16 +842,51 @@ app.layout = dbc.Container([
             ]),
             dbc.Col([
                 html.Label('Filter'),
-                dcc.Div(className='toggle-rect-dark', children=[
-                    dcc.Checklist(
-                        id='map-filter',
-                        inline=True,
-                        className='checklist'
-                        ),   
-                    ]),
+                
+                dcc.Checklist(
+                    id='map-filter',
+                    inline=True,
+                    className='checklist'
+                    ),   
+                    
                  
             ]), #style={'padding': 10, 'flex': 1})
         ]), #style={'display': 'flex', 'flex-direction': 'row'}),
+        
+        dbc.Row([
+            dbc.Col([
+                html.Br(),
+                html.Label('Category'),
+                dmc.Select(
+                    label="Select category",
+                    placeholder="Select one",
+                    id="framework-select",
+                    value="ng",
+                    data=[
+                        {"value": "environment", "label": "Environment"},
+                    ],
+                    style={"width": 200, "marginBottom": 10},
+                ),
+            ]),
+            dbc.Col([
+                dmc.CheckboxGroup(
+                    id="map-filter2",
+                    label="Select a filter",
+                    description="This is anonymous",
+                    orientation="horizontal",
+                    offset="md",
+                    mb=10,
+                    children=[
+                        dmc.Checkbox(label="Test", value="test"),
+                    ],
+                    #value=["react", "vue"],
+                ),
+                dmc.Text(id="checkbox-group-output"),
+                    
+                 
+            ]), #style={'padding': 10, 'flex': 1})
+        ]), #style={'display': 'flex', 'flex-direction': 'row'}),
+        
         dbc.Row([
             dbc.Col(
                 dcc.Graph(

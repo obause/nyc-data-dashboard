@@ -2,6 +2,8 @@
 plotly==5.14.1
 dash==2.9.3
 dash_bootstrap_components==1.4.1
+dash-iconify==0.1.2
+dash-mantine-components==0.12.1
 
 # Data handling
 pandas==1.5.3
