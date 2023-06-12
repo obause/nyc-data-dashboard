@@ -306,3 +306,29 @@ def get_school_loc():
     df_school_loc = pd.read_csv('data/school_locations_2019_2020.csv')
     df_school_loc.rename(columns={"LONGITUDE": "Longitude", "LATITUDE": "Latitude"}, inplace=True)
     return df_school_loc
+
+def get_facilities(facgroup = None, facsubgrp = None):
+    df_fac = pd.read_csv('data/facilities.csv')
+    df_fac = df_fac[["facname","latitude","longitude","facgroup","facsubgrp","factype"]]
+    df_fac.rename(columns={"longitude": "Longitude", "latitude": "Latitude"}, inplace=True)
+    
+    if facgroup is not None:
+        return df_fac[df_fac['facgroup'] == facgroup]
+    elif facsubgrp is not None:
+        return df_fac[df_fac['facsubgrp'] == facsubgrp]
+
+    return df_fac
+
+def get_parking_geodata():
+    with open('data/Parking.geojson') as f:
+        nypd_parking_geo = json.load(f)
+    return nypd_parking_geo
+
+def get_hurricane_geodata():
+    with open('data/Hurricane_Evac_Zones.geojson') as f:
+        nypd_hurricane_geo = json.load(f)
+    return nypd_hurricane_geo
+
+
+
+
