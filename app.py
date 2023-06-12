@@ -303,6 +303,7 @@ data_dict['nypd_precincts']['data'] = nypd_precincts_geo
 community_districts_geo = get_community_districts_geodata()
 data_dict['community_districts']['data'] = community_districts_geo
 
+
 nyc_crime_shootings = get_crime_shootings()
 data_dict['shootings']['data'] = nyc_crime_shootings
 nyc_crime_arrests = get_crime_arrests()
@@ -423,8 +424,6 @@ data_dict['parking']['data'] = nypd_parking_geo
 nypd_hurricane_geo = get_hurricane_geodata()
 data_dict['hurricane']['data'] = nypd_hurricane_geo
 
-
-
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
 fig_map = go.Figure(go.Scattermapbox())
@@ -463,7 +462,30 @@ fig_map.update_layout(
     font_color=COLORS['text']
 )
 
-indicators = get_nyc_borough_indicators()
+
+community_districts_geodf = get_community_districts_geodf()
+fig_cd_map = go.Figure(go.Scattermapbox())
+fig_cd_map.add_trace(go.Scattermapbox(
+                    lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
+                    text=community_districts_geodf['displayname'],
+                    mode='text',
+                ))
+fig_cd_map.update_layout(
+    mapbox = {
+            'accesstoken': mapbox_access_token,
+            #'style': "stamen-terrain",
+            'center': { 'lon': -73.935242, 'lat': 40.730610},
+            'zoom': 10, 
+            'layers': [{
+                'source': community_districts_geo,
+                'type': "fill", 'below': "traces", 'color': "green", 'opacity': 0.5
+                }],
+        },
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+        height=400,
+    )
+
+boro_indicators = get_nyc_borough_indicators()
 categories = [
     'Age under 18', 
     'Age 65 & Over',
@@ -474,14 +496,14 @@ categories = [
     'Crime Rate',
 ]
 fig_radar = go.Figure()
-for i in range(0, len(indicators)):
+for i in range(0, len(boro_indicators)):
     fig_radar.add_trace(go.Scatterpolar(
-        r=indicators[categories].iloc[i].values,
+        r=boro_indicators[categories].iloc[i].values,
         theta=categories,
         fill='toself',
-        name=indicators['borough'][i],
+        name=boro_indicators['borough'][i],
         mode='markers',
-        visible='legendonly' if indicators['borough'][i] != 'New York City' else None
+        visible='legendonly' if boro_indicators['borough'][i] != 'New York City' else None
     ))
 fig_radar.update_layout(
   #polar=dict(
@@ -494,6 +516,7 @@ fig_radar.update_layout(
   clickmode='event+select'
 )
 fig_radar_bar = go.Figure(go.Bar())
+
 
 # Generate Filter Options
 @app.callback(
@@ -529,6 +552,7 @@ def set_filter_options(selected_category, selected_filters):
                         variant="outline"
                         )
                     )
+
 
     return options
 
@@ -663,6 +687,110 @@ def display_click_data(clickData, state):
     return content #json.dumps(clickData, indent=2)
 
 @app.callback(
+    Output('cd-demographics', 'style'),
+    Input('cd-dropdown', 'value'))
+def hide_cd_demo(cd):
+    if cd is None:
+        return {'display': 'none'}
+    
+
+demo_ages_cd = get_cd_demographic_data()
+cd_indicators = get_cd_indicators()
+@app.callback(
+    Output('cd-demographics', 'figure'),
+    Input('cd-dropdown', 'value'))
+def update_cd_demo(cd):
+    if cd is None:
+        return go.Figure()
+    print("selected cd: ", cd)
+    filtered_df = demo_ages_cd[demo_ages_cd["cd_number"] == cd]
+    #filtered_df.drop(columns=['cd_number'], inplace=True)
+    fig = px.bar(
+        filtered_df
+        #.drop(columns="index")
+        .assign(group=lambda d: d["gender"].astype(str)),
+        y="age_group",
+        x="value",
+        facet_col="gender",
+        facet_col_spacing=0.1,
+        color="gender",
+        color_discrete_sequence=["#472323", "#233147"],
+        labels=get_cd_demographic_legend()
+    )
+    fig.update_layout(
+        yaxis2={"side": "right", "matches": None, "showticklabels": False},
+        yaxis={"side": "right", "showticklabels": True, "title": ""},
+        xaxis={"autorange": "reversed", "title": "Population %"},
+        xaxis2={"matches": None, "title": "Population %"},
+        showlegend=False,
+        width=500,
+        bargap=0.50,
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+    )
+    fig.update_traces(width=0.4)
+    #fig.for_each_annotation(lambda a: a.update(text=""))
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+    #fig.update_traces(texttemplate="%{y}", textposition="inside")
+    return fig
+
+
+#@app.callback(
+#    Output('cd-map', 'figure'),
+#    Input('cd-dropdown', 'value'))
+def update_cd_map(selected_cd):
+    if selected_cd is None:
+        center = [40.730610, -73.935242]
+        zoom = 10
+    else:
+        center = community_districts_geodf[community_districts_geodf['GEOCODE']==selected_cd][['Latitude', 'Longitude']].values[0].tolist()
+        zoom = 12
+    fig_cd_map = go.Figure(go.Scattermapbox())
+    fig_cd_map.add_trace(go.Scattermapbox(
+                        lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
+                        text=community_districts_geodf['displayname'],
+                        mode='text',
+                    ))
+    print("center: ", center)
+    fig_cd_map.update_layout(
+        mapbox = {
+                'accesstoken': mapbox_access_token,
+                #'style': "stamen-terrain",
+                'center': { 'lon': center[0], 'lat': center[1]},
+                'zoom': zoom, 
+                'layers': [{
+                    'source': community_districts_geo,
+                    'type': "fill", 'below': "traces", 'color': "green", 'opacity': 0.5
+                    }],
+            },
+            margin = {'l':0, 'r':0, 'b':0, 't':0},
+            height=400,
+        )
+    return fig_cd_map
+
+@app.callback(
+    Output('cd-indicators', 'figure'),
+    Input('cd-dropdown', 'value'))
+def update_cd_indicators(selected_cd):
+    if selected_cd is None:
+        return None
+    
+    filtered_df = cd_indicators[cd_indicators["cd_number"] == selected_cd]
+    
+    fig = go.Figure()
+    for col in filtered_df.columns[3:]:
+        print("col: ", col)
+        print("value: ", filtered_df[col].values[0])
+        fig.add_trace(go.Indicator(
+            mode = "number",
+            value = filtered_df[col].values[0],
+            title={"text": col},
+            #domain = {'x': [0, 0.5], 'y': [0, 0.5]},
+            #delta = {'reference': 400, 'relative': True, 'position' : "top"}
+        ))
+    return fig
+
+
+@app.callback(
     Output("graph", "figure"),
     Input("dropdown", "value")
 )
@@ -704,7 +832,6 @@ def update_line_chart(selected_year):
         title_x=0.5
     )  
     return fig
-
 
 @app.callback(
     Output("stacked", "figure"),
@@ -788,16 +915,8 @@ def update_radar(selected_year):
     return fig
 
 
+dropdown_options_cd = [{"label": f"{value['GEONAME']} ({value['GEOCODE']})", "value": value['GEOCODE']} for i, value in community_districts_geodf.iterrows()]
 
-markdown_text = '''
-##### Dash and Markdown
-
-Dash apps can be written in Markdown.
-Dash uses the [CommonMark](http://commonmark.org/)
-specification of Markdown.
-Check out their [60 Second Markdown Tutorial](http://commonmark.org/help/)
-if this is your first introduction to Markdown!
-'''
 
 # App layout
 app.layout = dbc.Container([
@@ -926,7 +1045,7 @@ app.layout = dbc.Container([
         ]),
         dbc.Row(
             dbc.Col(
-                dcc.Slider(1, 3, 1,
+              dcc.Slider(1, 3, 1,
                         value=2,
                         id='slider',
                         marks={
@@ -937,8 +1056,41 @@ app.layout = dbc.Container([
                 ), width={"size": 5, "offset": 4}
             )
         ),
+      
+       dbc.Row([
+        dbc.Col([
+            html.Br(),
+            html.Label('Category'),
+            dcc.Dropdown(dropdown_options_cd,
+                         #['Environment'],
+                         #multi=True,
+                         id='cd-dropdown'
+                         ), #style={'padding': 10, 'flex': 1}  
+        ], width=4),
+    ]),
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(
+                id='cd-map',
+                figure=fig_cd_map
+            ),
+            
+        ], width=4),
+        dbc.Col([
+            dcc.Graph(
+                id='cd-demographics',
+                #figure=fig_cd_map
+            ),
+        ], width=4),
+        dbc.Col([
+            dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
+                mode = "number",
+                value = 0,))),
+        ], width=4),
+    ]),
     ],fluid=True,),
 ], class_name="main-container",fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
+
 
 
 

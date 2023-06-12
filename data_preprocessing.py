@@ -32,6 +32,9 @@ def get_borough_mappings():
     })
     return borough_mapping
 
+def calculate_centroids(gdf, geometry_column='geometry'):
+    gdf['Longitude'] = gdf[geometry_column].centroid.x
+    gdf['Latitude'] = gdf[geometry_column].centroid.y
 
 def get_crime_arrests(truncated=True):
     if truncated:
@@ -70,6 +73,10 @@ def get_nyc_borough_indicators():
     indicators.rename(columns=indicators_legend, inplace=True)
     return indicators
 
+def get_cd_indicators():
+    cd_indicators = pd.read_csv('data/social/cd_demographic_race_economics.csv')
+    return cd_indicators
+
 def get_hospital_data():
     hospitals = pd.read_csv('data/social/NYC_Health___Hospitals_patient_care_locations_-_2011.csv')
     return hospitals
@@ -93,6 +100,97 @@ def get_air_quality_data(measure_name, time_period='Annual Average 2020'):
     
     return multipolygon_json, pd_by_cm
     
+def get_cd_demographic_data():
+    demo_ages = pd.read_csv("data/social/cd_demographic_age_gender.csv")
+
+    #demo_ages_test = demo_ages[demo_ages['cd_number'] == 201]
+    #demo_ages_female = demo_ages_test.iloc[:, 7:25]
+    #demo_ages_male = demo_ages_test.iloc[:, 25:]
+    demo_ages = demo_ages.iloc[:, 1:-4]
+    demo_ages = demo_ages.drop(columns=demo_ages.iloc[:, 1:6])
+    demo_ages_pivot = demo_ages.melt(id_vars=['cd_number'], var_name='age_group', value_name='value')
+    demo_ages_pivot['gender'] = demo_ages_pivot['age_group'].str.split('_').str[2]
+    legend = {
+        'pop_pct_female_under_5': 'under 5', 
+        'pop_pct_female_5_9': '5 to 9',
+        'pop_pct_female_10_14': '10 to 14', 
+        'pop_pct_female_15_19': '15 to 19',
+        'pop_pct_female_20_24': '20 to 24',
+        'pop_pct_female_25_29': '25 to 29',
+        'pop_pct_female_30_34': '30 to 34',
+        'pop_pct_female_35_39': '35 to 39',
+        'pop_pct_female_40_44': '40 to 44',
+        'pop_pct_female_45_49': '45 to 49',
+        'pop_pct_female_50_54': '50 to 54',
+        'pop_pct_female_55_59': '55 to 59',
+        'pop_pct_female_60_64': '60 to 64',
+        'pop_pct_female_65_69': '65 to 69',
+        'pop_pct_female_70_74': '70 to 74',
+        'pop_pct_female_75_79': '75 to 79',
+        'pop_pct_female_80_84': '80 to 84',
+        'pop_pct_female_85_over': '85 & over',
+        'pop_pct_male_under_5': 'under 5',
+        'pop_pct_male_5_9': '5 to 9',
+        'pop_pct_male_10_14': '10 to 14',
+        'pop_pct_male_15_19': '15 to 19',
+        'pop_pct_male_20_24': '20 to 24',
+        'pop_pct_male_25_29': '25 to 29',
+        'pop_pct_male_30_34': '30 to 34',
+        'pop_pct_male_35_39': '35 to 39',
+        'pop_pct_male_40_44': '40 to 44',
+        'pop_pct_male_45_49': '45 to 49',
+        'pop_pct_male_50_54': '50 to 54',
+        'pop_pct_male_55_59': '55 to 59',
+        'pop_pct_male_60_64': '60 to 64',
+        'pop_pct_male_65_69': '65 to 69',
+        'pop_pct_male_70_74': '70 to 74',
+        'pop_pct_male_75_79': '75 to 79',
+        'pop_pct_male_80_84': '80 to 84',
+        'pop_pct_male_85_over': '85 & over'
+        }
+    demo_ages_pivot.replace({'age_group': legend}, inplace=True)
+    return demo_ages_pivot
+
+def get_cd_demographic_legend():
+    legend = {
+        'pop_pct_female_under_5': 'under 5', 
+        'pop_pct_female_5_9': '5 to 9',
+        'pop_pct_female_10_14': '10 to 14', 
+        'pop_pct_female_15_19': '15 to 19',
+        'pop_pct_female_20_24': '20 to 24',
+        'pop_pct_female_25_29': '25 to 29',
+        'pop_pct_female_30_34': '30 to 34',
+        'pop_pct_female_35_39': '35 to 39',
+        'pop_pct_female_40_44': '40 to 44',
+        'pop_pct_female_45_49': '45 to 49',
+        'pop_pct_female_50_54': '50 to 54',
+        'pop_pct_female_55_59': '55 to 59',
+        'pop_pct_female_60_64': '60 to 64',
+        'pop_pct_female_65_69': '65 to 69',
+        'pop_pct_female_70_74': '70 to 74',
+        'pop_pct_female_75_79': '75 to 79',
+        'pop_pct_female_80_84': '80 to 84',
+        'pop_pct_female_85_over': '85 & over',
+        'pop_pct_male_under_5': 'under 5',
+        'pop_pct_male_5_9': '5 to 9',
+        'pop_pct_male_10_14': '10 to 14',
+        'pop_pct_male_15_19': '15 to 19',
+        'pop_pct_male_20_24': '20 to 24',
+        'pop_pct_male_25_29': '25 to 29',
+        'pop_pct_male_30_34': '30 to 34',
+        'pop_pct_male_35_39': '35 to 39',
+        'pop_pct_male_40_44': '40 to 44',
+        'pop_pct_male_45_49': '45 to 49',
+        'pop_pct_male_50_54': '50 to 54',
+        'pop_pct_male_55_59': '55 to 59',
+        'pop_pct_male_60_64': '60 to 64',
+        'pop_pct_male_65_69': '65 to 69',
+        'pop_pct_male_70_74': '70 to 74',
+        'pop_pct_male_75_79': '75 to 79',
+        'pop_pct_male_80_84': '80 to 84',
+        'pop_pct_male_85_over': '85 & over'
+        }
+    return legend
 
 def get_squirrels():
     squirrels = pd.read_csv('data/environment/2018_Central_Park_Squirrel_Census_-_Squirrel_Data.csv')
@@ -113,6 +211,17 @@ def get_community_districts_geodata():
         nyc_uhf42_geo = json.load(f)
     return nyc_uhf42_geo
 
+def get_community_districts_geodf():
+    #nyc_cd = pd.read_csv("../data/reference_data/nycd.csv")
+    #nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
+    #gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
+    #gdf.drop('the_geom', axis=1, inplace=True)
+    gdf = gpd.read_file('data/reference_data/UHF42.geo.json')
+    #gdf = gdf.set_index('BoroCD')
+    gdf['Longitude'] = gdf['geometry'].centroid.x
+    gdf['Latitude'] = gdf['geometry'].centroid.y
+    gdf['displayname'] = [f'{a} <br> {b}' for a, b in zip(gdf["GEOCODE"], gdf["GEONAME"])]
+    return gdf
 
 def get_borough_geodata():
     with open("data/Borough_Boundaries.geojson") as f:
