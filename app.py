@@ -51,246 +51,16 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBOR
 
 map_categories = ['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation']
 
-marker_style_shooting = dict(
-            size=6,
-            color='#9E1030',
-            opacity=1
-        )    
-
-marker_style_arrests = dict(
-            size=6,
-            color='rgb(0, 255, 0)',
-            #symbol='bus',
-            opacity=1
-)
-
-marker_style_squirrels = dict(
-            size=4,
-            color='orange',
-            opacity=1
-)
-
-#marker_style_hospitals = dict(
-#            size=8,
-#            color='rgb(0, 0, 255)',
-#            opacity=1
-#)
-
-marker_style_cars = dict(
-            size=6,
-            color='black',
-            opacity=1
-)
-
-marker_style_schools = dict(
-            size=6,
-            color='#EFC050',
-            opacity=1
-)
-
-marker_style_hist_sites = dict(
-            size=6,
-            color='#45B8AC',
-            opacity=1
-)
-
-marker_style_colleges = dict(
-            size=6,
-            color='#955251',
-            opacity=1
-)
-
-marker_style_youth_services = dict(
-            size=6,
-            color='#B565A7',
-            opacity=1
-)
-
-marker_style_camps = dict(
-            size=6,
-            color='#009B77',
-            opacity=1
-)
-
-marker_style_libraries = dict(
-            size=6,
-            color='#D65076',
-            opacity=1
-)
-
-marker_style_cult = dict(
-            size=6,
-            color='#5B5EA6',
-            opacity=1
-)
-
-marker_style_hospitals = dict(
-            size=6,
-            color='#FFD662',
-            opacity=1
-)
-
-marker_style_mental = dict(
-            size=6,
-            color='#DFCFBE',
-            opacity=1
-)
-
-marker_style_residential = dict(
-            size=6,
-            color='#B55A30',
-            opacity=1
-)
-
-marker_style_senior = dict(
-            size=6,
-            color='#A0DAA9',
-            opacity=1
-)
-
-marker_style_soup = dict(
-            size=6,
-            color='#755139',
-            opacity=1
-)
-
-marker_style_bus = dict(
-            size=6,
-            color='#363945',
-            opacity=1
-)
-
-marker_style_railyards = dict(
-            size=6,
-            color='#939597',
-            opacity=1
-)
-
-marker_style_ports = dict(
-            size=6,
-            color='#E0B589',
-            opacity=1
-)
-
-marker_style_airports = dict(
-            size=6,
-            color='#BFD641',
-            opacity=1
-)
-
-marker_style_fireservices = dict(
-            size=6,
-            color='#FF6F61',
-            opacity=1
-)
-
-marker_style_policeservices = dict(
-            size=6,
-            color='#00758F',
-            opacity=1
-)
-
-marker_style_court = dict(
-            size=6,
-            color='#6B5876',
-            opacity=1
-)
-
-marker_style_detention = dict(
-            size=6,
-            color='#282D3C',
-            opacity=1
-)
-
-data_dict = {
-    "nypd_precincts": {"color": "#2596be"},
-    "shootings": {"marker_style": marker_style_shooting, "text": "Shooting Incident"},
-    "arrests": {"marker_style": marker_style_arrests, "text": "Arrest", "colorscale": 'Reds', "radius": 2},
-    "car_accidents": {"marker_style": marker_style_cars, "text": "Car Accident", "colorscale": 'Reds', "radius": 2},
-    "fireservices": {"marker_style": marker_style_fireservices, "text": "Fire Services", "colorscale": 'Reds', "radius": 2},
-    "policeservices": {"marker_style": marker_style_policeservices, "text": "Police Services", "colorscale": 'Reds', "radius": 2},
-    "court": {"marker_style": marker_style_court, "text": "Courthouses and Judical", "colorscale": 'Reds', "radius": 2},
-    "detention": {"marker_style": marker_style_detention, "text": "Detention and Correctional", "colorscale": 'Reds', "radius": 2},
-    
-    "borough": {"color": "white"},
-    "borough_labels": {"mode": "text", "type": "points"},
-    "community_districts": {"color": "#f8ff99"},
-    "parks": {"color": "#105200"},
-    "parking": {"color": "#808080"},
-    "hurricane": {"color": "#8A2BE2"},
-    "hist_sites": {"marker_style": marker_style_hist_sites, "text": "Historical Sites", "colorscale": 'Reds', "radius": 2},
-    "squirrels": {"marker_style": marker_style_squirrels, "text": "Squirrel", "color": "orange", "center": {"lat": 40.78108498, "lon": -73.96715340}, 'zoom': 14},
-    
-    "schools": {"marker_style": marker_style_schools, "text": "School"},
-    "colleges": {"marker_style": marker_style_colleges, "text": "Colleges or Universities", "colorscale": 'Reds', "radius": 2},
-    "youth_services": {"marker_style": marker_style_youth_services, "text": "Colleges or Universities", "colorscale": 'Reds', "radius": 2},
-    "camps": {"marker_style": marker_style_camps, "text": "Camps", "colorscale": 'Reds', "radius": 2},
-    
-    "libraries": {"marker_style": marker_style_libraries, "text": "Libraries", "colorscale": 'Reds', "radius": 2},
-    "cult": {"marker_style": marker_style_cult, "text": "Cultural Institutions", "colorscale": 'Reds', "radius": 2},
-    
-    "air_pollution": {"colorscale": ['green', 'orange', 'red', 'red'], "zmin": 0, "zmax": 7,},
-    "hospitals": {"marker_style": marker_style_hospitals, "text": "Hospitals and Clinics", "colorscale": 'Reds', "radius": 2},
-    "mental": {"marker_style": marker_style_mental, "text": "Mental Health", "colorscale": 'Reds', "radius": 2},
-    "residential": {"marker_style": marker_style_residential, "text": "Residential Health Care", "colorscale": 'Reds', "radius": 2},
-    "senior": {"marker_style": marker_style_senior, "text": "Senior Services", "colorscale": 'Reds', "radius": 2},
-    "soup": {"marker_style": marker_style_soup, "text": "Soup Kitchens and Food Pantries", "colorscale": 'Reds', "radius": 2},
-    
-    "bus": {"marker_style": marker_style_bus, "text": "Bus Depots and Terminals", "colorscale": 'Reds', "radius": 2},
-    "railyards": {"marker_style": marker_style_railyards, "text": "Rail Yards and Maintenance", "colorscale": 'Reds', "radius": 2},
-    "ports": {"marker_style": marker_style_ports, "text": "Ports and Ferry Landings", "colorscale": 'Reds', "radius": 2},
-    "airports": {"marker_style": marker_style_airports, "text": "Airports and Helicopters", "colorscale": 'Reds', "radius": 2},
-    
-    #"hospitals": {"marker_style": marker_style_hospitals, "text": "Hospital"},
-
-}
-
-filter_options = {
-    "nypd_precincts": {"name": "NYPD Precincts", "category": "Public Safety, Emergency Services and Justice", "type": "polygons", "icon": "map:police"},
-    "shootings": {"name": "Shootings", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:pistol'},
-    "arrests": {"name": "Arrests", "category": "Public Safety, Emergency Services and Justice", "type": "density", 'icon': 'game-icons:handcuffs'},
-    "car_accidents": {"name": "Car Accidents", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'tabler:car-crash'},
-    "fireservices": {"name": "Fire Services", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:fire-truck'},
-    "policeservices": {"name": "Police Services", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:police-station'},
-    "court": {"name": "Courthouses and Judical", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'mdi:court-hammer'},
-    "detention": {"name": "Detention and Correctional", "category": "Public Safety, Emergency Services and Justice", "type": "points", 'icon': 'game-icons:prisoner'},
-    
-    "borough": {"name": "Boroughs", "category": "Environment", "type": "polygons", "connected_to": "borough_labels"},
-    "borough_labels": {"name": "Boroughs", "category": "hidden", "type": "points"},
-    "community_districts": {"name": "Community Districts", "category": "Environment", "type": "polygons"},
-    "parks": {"name": "Parks", "category": "Environment", "type": "polygons"},
-    "parking": {"name": "Parking Lots", "category": "Environment", "type": "polygons"},
-    "hurricane": {"name": "Hurricane Evacuation Zones", "category": "Environment", "type": "polygons"},
-    "hist_sites":{"name": "Historical Sites", "category": "Environment", "type": "points" },
-    "squirrels": {"name": "Squirrels", "category": "Environment", "type": "points"},
-    
-    "schools": {"name": "Schools", "category": "Education and Youth", "type": "points"},
-    "colleges":{"name": "Colleges or Universities", "category": "Education and Youth", "type": "points" },
-    "youth_services":{"name": "Youth Services", "category": "Education and Youth", "type": "points" },
-    "camps":{"name": "Camps", "category": "Education and Youth", "type": "points" },
-    
-    "libraries":{"name": "Libraries", "category": "Libraries and Cultural Programs", "type": "points" },
-    "cult":{"name": "Cultural Institutions", "category": "Libraries and Cultural Programs", "type": "points" },
-    
-    "air_pollution": {"name": "Air Pollution", "category": "Health and Human Services", "type": "choropleth"},
-    "hospitals":{"name": "Hospitals and Clinics", "category": "Health and Human Services", "type": "points" },
-    "mental":{"name": "Mental Health", "category": "Health and Human Services", "type": "points" },
-    "residential":{"name": "Residential Health Care", "category": "Health and Human Services", "type": "points" },
-    "senior":{"name": "Senior Services", "category": "Health and Human Services", "type": "points" },
-    "soup":{"name": "Soup Kitchens and Food Pantries", "category": "Health and Human Services", "type": "points" },
-    
-    "bus":{"name": "Bus Depots and Terminals", "category": "Transportation", "type": "points" },
-    "railyards":{"name": "Rail Yards and Maintenance", "category": "Transportation", "type": "points" },
-    "ports":{"name": "Ports and Ferry Landings", "category": "Transportation", "type": "points" },
-    "airports":{"name": "Airports and Helicopters", "category": "Transportation", "type": "points" },
-    
-    #"hospitals": {"name": "Hospitals", "category": "Social/Health", "type": "points"},
-}
+# save data_dict as json file
+with open('data_dict.json', 'r') as f:
+    data_dict = json.load(f)
+with open('data_meta.json', 'r') as f:
+    filter_options = json.load(f)
 
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
-    "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'}
-
+    "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
+    "schools": {}
 }
 
 # Data loading and preprocessing
@@ -327,12 +97,29 @@ nyc_borough_mapping = get_borough_mappings()
 data_dict['borough_labels']['data'] = nyc_borough_mapping
 data_dict['borough_labels']['text'] = nyc_borough_mapping['borough_name']
 
-multipolygon_json, pd_by_cm = get_air_quality_data(measure_name='Fine Particulate Matter (PM2.5)')
-data_dict['air_pollution']['data'] = pd_by_cm
-data_dict['air_pollution']['text'] = pd_by_cm['Geo Place Name']
-data_dict['air_pollution']['locations'] = pd_by_cm['Geo Join ID']
-data_dict['air_pollution']['values'] = pd_by_cm['Data Value']
-data_dict['air_pollution']['geodata'] = community_districts_geo
+
+df_air = get_air_quality_data()
+air_quality_measures = {
+    'air_pollution_pm25': {'measure_name': 'Fine Particulate Matter (PM2.5)', 'time_period': 'Annual Average 2020'},
+    'air_pollution_hospitalizations': {'measure_name': 'PM2.5-Attributable Respiratory Hospitalizations (Adults 20 Yrs and Older)', 'time_period': '2015-2017'},    
+    'air_toxics': {'measure_name': 'Air Toxics Concentrations- Average Benzene Concentrations', 'time_period': '2011'},
+    'air_pollution_ozone': {'measure_name': 'Ozone (O3)', 'time_period': 'Summer 2020'},
+    'air_pollution_so2': {'measure_name': 'Sulfur Dioxide (SO2)', 'time_period': 'Winter 2015-16'},
+    'air_pollution_no2': {'measure_name': 'Nitrogen Dioxide (NO2)', 'time_period': 'Annual Average 2020'},
+    'traffic_density': {'measure_name': 'Traffic Density- Annual Vehicle Miles Traveled', 'time_period': '2016'},
+    }
+for key, value in air_quality_measures.items():
+    df_air_filtered = df_air[(df_air['Name'] == value['measure_name']) & (df_air['Time Period'] == value['time_period'])]
+    data_dict[key]['data'] = df_air_filtered
+    data_dict[key]['text'] = df_air_filtered['Geo Place Name']
+    data_dict[key]['locations'] = df_air_filtered['Geo Join ID']
+    data_dict[key]['values'] = df_air_filtered['Data Value']
+    data_dict[key]['geodata'] = community_districts_geo
+
+community_districts_geodf = get_community_districts_geodf()
+data_dict['community_districts_labels']['data'] = community_districts_geodf
+data_dict['community_districts_labels']['data'] = community_districts_geodf
+data_dict['community_districts_labels']['text'] = community_districts_geodf['displayname']
 
 df_radar_2022, df_radar_2018, df_radar_2015 = get_measures_radar()
 df_stacked_2022, df_stacked_2018, df_stacked_2015 = get_measures_stacked()
@@ -428,22 +215,6 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 
 fig_map = go.Figure(go.Scattermapbox())
 
-#fig.add_trace(go.Scattermapbox(
-#    mode = "markers",
-#    lon = nyc_crime_shootings.Longitude, lat = nyc_crime_shootings.Latitude,
-#    marker = marker_style_shooting,
-#    text=f"Shooting Incident" # <br>Occur date: {nypd_shootings_2022.OCCUR_DATE}<br>Precinct: {nypd_shootings_2022.PRECINCT}<br>Age group: {nypd_shootings_2022.PERP_AGE_GROUP}<br>Sex: {nypd_shootings_2022.PERP_SEX}<br>Race: {nypd_shootings_2022.PERP_RACE}<br>"
-#    ))
-
-#fig.update_traces(cluster=dict(enabled=True))
-
-#fig.add_trace(go.Densitymapbox(
-#    lon = nypd_arrests_2022.Longitude, lat = nypd_arrests_2022.Latitude,
-#    radius=3,
-#    ))
-
-
-
 fig_map.update_layout(
     mapbox = {
             'accesstoken': mapbox_access_token,
@@ -462,8 +233,6 @@ fig_map.update_layout(
     font_color=COLORS['text']
 )
 
-
-community_districts_geodf = get_community_districts_geodf()
 fig_cd_map = go.Figure(go.Scattermapbox())
 fig_cd_map.add_trace(go.Scattermapbox(
                     lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
@@ -574,6 +343,7 @@ def update_map(filter_values):
         for filter_value in filter_values:
             if filter_options[filter_value].get('connected_to') is not None:
                 filter_values.append(filter_options[filter_value]['connected_to'])
+                print("Connected to: {}".format(filter_options[filter_value]['connected_to']))
             
             if data_dict[filter_value].get('center') is not None:
                 center = data_dict[filter_value]['center']
@@ -680,11 +450,14 @@ def display_click_data(clickData, state):
     
     print("attributes_list: ", attributes_list)
     
-    content = dash_table.DataTable(
-        columns=[{"name": 'attribute', "id": 'attribute'}, {"name": 'value', "id": 'value'}],
-        data=[{'attribute': attributes_list[col], 'value': value} for col, value in point_data.items() if col in selected_attributes]
-    )
-    return content #json.dumps(clickData, indent=2)
+    #content = dash_table.DataTable(
+    #    columns=[{"name": 'attribute', "id": 'attribute'}, {"name": 'value', "id": 'value'}],
+    #    data=[{'attribute': attributes_list[col], 'value': value} for col, value in point_data.items() if col in selected_attributes]
+    #)
+    header = [html.Thead(html.Tr([html.Th("Attribute"), html.Th("Value")]))]
+    rows = [html.Tr([html.Td(attributes_list[col]), html.Td(str(value).replace("True", "Yes"))]) for col, value in point_data.items() if col in selected_attributes]
+    table = [html.Thead(header), html.Tbody(rows)]
+    return table #json.dumps(clickData, indent=2)
 
 @app.callback(
     Output('cd-demographics', 'style'),
@@ -917,11 +690,38 @@ def update_radar(selected_year):
 
 dropdown_options_cd = [{"label": f"{value['GEONAME']} ({value['GEOCODE']})", "value": value['GEOCODE']} for i, value in community_districts_geodf.iterrows()]
 
+@app.callback(
+    Output("drawer-data-details", "children"),
+    Input("map-filter", "value"),
+    #prevent_initial_call=True,
+)
+def drawer_data_details(filter_values):
+    content = []
+    if filter_values is None:
+        content.append(html.P("No data selected. Please select data from the filter options."))
+    else:
+        for filter_value in filter_values:
+            content += [
+                dmc.Text(filter_options[filter_value].get('name'), size="xl"),
+                dmc.Text('Data Description:', weight=500),
+                dmc.Text(filter_options[filter_value].get('description')),
+                dmc.Text(f"Data period: {filter_options[filter_value].get('data_period')}", color='dimmed'),
+                dmc.Text(f"Source: <a href={filter_options[filter_value].get('source')}>{filter_options[filter_value].get('source')}</a>", size='sm'),
+                dmc.Divider(variant="solid"),
+            ]
+    return content
+
+@app.callback(
+    Output("drawer-data-details", "opened"),
+    Input("data-details-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def drawer_demo(n_clicks):
+    return True
 
 # App layout
 app.layout = dbc.Container([
     dbc.Container([
-        
         dbc.Row([
             #html.Img(src=app.get_asset_url('images/new-york-city-skyline-silhouette.png'), className='logo'),
             html.H1(
@@ -970,9 +770,9 @@ app.layout = dbc.Container([
                     data=[{'value': i, 'label': i} for i in map_categories],
                     clearable=True,
                     icon=DashIconify(icon="bxs:category"),
-                    style={"width": 400, "marginBottom": 10},
+                    style={"width": 350, "marginBottom": 10},
                 ),
-            ], width=4),
+            ], width=3),
             dbc.Col([
                 dmc.Text("Select a filter", weight=500),
                 dmc.ChipGroup(
@@ -985,109 +785,136 @@ app.layout = dbc.Container([
                     #mb=10,
                 ),
                 dmc.Text(id="chips-values-output"),
-            ], width=8), #style={'padding': 10, 'flex': 1})
+            ], width=9), #style={'padding': 10, 'flex': 1})
         ]), #style={'display': 'flex', 'flex-direction': 'row'}),
         
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id='map',
-                    figure=fig_map
+                    figure=fig_map,
+                    className='map',
                 ),
                 width=10
             ),
             dbc.Col([
                 html.H3("Detailed Information"),
+                dmc.Button("Show dataset details", id="data-details-button"),
                 html.H6("Click on any data point to show detailed information about this point"),
                 html.Div(id='map-click-data'),
+                dmc.Drawer(
+                    title="Data Details",
+                    id="drawer-data-details",
+                    padding="md",
+                    zIndex=10000,
+                    position="right",
+                ),
             ], width=2),
                 
         ]),
-        dbc.Row(
-            dbc.Col(
-                dcc.Graph(id="graph")
-            )
-        ),
-        dbc.Row([
-                dbc.Col(
-                    dcc.Dropdown(
-                        id="dropdown",
-                        options=[
-                            {"label": "Complete Timeline", "value": 20},
-                            {"label": "2010", "value": 2010},
-                            {"label": "2011", "value": 2011},
-                            {"label": "2012", "value": 2012},
-                            {"label": "2013", "value": 2013},
-                            {"label": "2014", "value": 2014},
-                            {"label": "2015", "value": 2015},
-                            {"label": "2016", "value": 2016},
-                            {"label": "2017", "value": 2017},
-                            {"label": "2018", "value": 2018},
-                            {"label": "2019", "value": 2019},
-                            {"label": "2020", "value": 2020},
-                            {"label": "2021", "value": 2021},
-                            {"label": "2022", "value": 2022},
-                            {"label": "2023", "value": 2023},
-                        ],
-                        value=20,
-                    ), width={"size": 2, "offset": 6}
+        dmc.Paper(
+            children=[
+                dbc.Row(
+                    dbc.Col(
+                        dcc.Graph(id="graph")
+                    )
                 ),
-            ], className="mt-4",
+                dbc.Row([
+                        dbc.Col(
+                            dcc.Dropdown(
+                                id="dropdown",
+                                options=[
+                                    {"label": "Complete Timeline", "value": 20},
+                                    {"label": "2010", "value": 2010},
+                                    {"label": "2011", "value": 2011},
+                                    {"label": "2012", "value": 2012},
+                                    {"label": "2013", "value": 2013},
+                                    {"label": "2014", "value": 2014},
+                                    {"label": "2015", "value": 2015},
+                                    {"label": "2016", "value": 2016},
+                                    {"label": "2017", "value": 2017},
+                                    {"label": "2018", "value": 2018},
+                                    {"label": "2019", "value": 2019},
+                                    {"label": "2020", "value": 2020},
+                                    {"label": "2021", "value": 2021},
+                                    {"label": "2022", "value": 2022},
+                                    {"label": "2023", "value": 2023},
+                                ],
+                                value=20,
+                            ), width={"size": 2, "offset": 6}
+                        ),
+                    ], className="mt-4",
+                ),
+            ],
+            shadow="xl",
+            p='xs',
+            radius='md'
         ),
-        
-        dbc.Row([
-            dbc.Col([
-                dcc.Graph(id="stacked")
-            ], width=6),
-            dbc.Col([
-                dcc.Graph(id="radar")
-            ], width=6),
-        ]),
-        dbc.Row(
-            dbc.Col(
-              dcc.Slider(1, 3, 1,
-                        value=2,
-                        id='slider',
-                        marks={
-                            1: {'label': '2015', 'style': {'color': '#77b0b1'}},
-                            2: {'label': '2018', 'style': {'color': '#77b0b1'}},
-                            3: {'label': '2022', 'style': {'color': '#77b0b1'}},
-                        }, included=False
-                ), width={"size": 5, "offset": 4}
-            )
+        html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
+        dmc.Paper(
+            children=[
+                
+                
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Graph(id="stacked")
+                    ], width=6),
+                    dbc.Col([
+                        dcc.Graph(id="radar")
+                    ], width=6),
+                ]),
+                dbc.Row(
+                    dbc.Col(
+                    dcc.Slider(1, 3, 1,
+                                value=2,
+                                id='slider',
+                                marks={
+                                    1: {'label': '2015', 'style': {'color': '#77b0b1'}},
+                                    2: {'label': '2018', 'style': {'color': '#77b0b1'}},
+                                    3: {'label': '2022', 'style': {'color': '#77b0b1'}},
+                                }, included=False
+                        ), width={"size": 5, "offset": 4}
+                    )
+                ),
+            ], shadow="xl", p='xs', radius='md'
         ),
-      
-       dbc.Row([
-        dbc.Col([
-            html.Br(),
-            html.Label('Category'),
-            dcc.Dropdown(dropdown_options_cd,
-                         #['Environment'],
-                         #multi=True,
-                         id='cd-dropdown'
-                         ), #style={'padding': 10, 'flex': 1}  
-        ], width=4),
-    ]),
-    dbc.Row([
-        dbc.Col([
-            dcc.Graph(
-                id='cd-map',
-                figure=fig_cd_map
-            ),
-            
-        ], width=4),
-        dbc.Col([
-            dcc.Graph(
-                id='cd-demographics',
-                #figure=fig_cd_map
-            ),
-        ], width=4),
-        dbc.Col([
-            dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
-                mode = "number",
-                value = 0,))),
-        ], width=4),
-    ]),
+        html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
+        dmc.Paper(
+            children=[
+            dbc.Row([
+                dbc.Col([
+                    html.Br(),
+                    html.Label('Category'),
+                    dcc.Dropdown(dropdown_options_cd,
+                                #value=dropdown_options_cd[0],
+                                #multi=True,
+                                id='cd-dropdown'
+                                ), #style={'padding': 10, 'flex': 1}  
+                ], width=4),
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    dcc.Graph(
+                        id='cd-map',
+                        figure=fig_cd_map
+                    ),
+                    
+                ], width=4),
+                dbc.Col([
+                    dcc.Graph(
+                        id='cd-demographics',
+                        #figure=fig_cd_map
+                    ),
+                ], width=4),
+                dbc.Col([
+                    dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
+                        mode = "number",
+                        value = 0,))),
+                ], width=4),
+            ]),
+            ], shadow="xl", p='xs', radius='md'
+        ),
+        html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
     ],fluid=True,),
 ], class_name="main-container",fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
 

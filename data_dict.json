@@ -1,0 +1,321 @@
+{
+    "nypd_precincts": {
+        "color": "#2596be"
+    },
+    "shootings": {
+        "marker_style": {
+            "size": 6,
+            "color": "#9E1030",
+            "opacity": 1
+        },
+        "text": "Shooting Incident"
+    },
+    "arrests": {
+        "marker_style": {
+            "size": 6,
+            "color": "rgb(0, 255, 0)",
+            "opacity": 1
+        },
+        "text": "Arrest",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "car_accidents": {
+        "marker_style": {
+            "size": 6,
+            "color": "black",
+            "opacity": 1
+        },
+        "text": "Car Accident",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "fireservices": {
+        "marker_style": {
+            "size": 6,
+            "color": "#FF6F61",
+            "opacity": 1
+        },
+        "text": "Fire Services",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "policeservices": {
+        "marker_style": {
+            "size": 6,
+            "color": "#00758F",
+            "opacity": 1
+        },
+        "text": "Police Services",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "court": {
+        "marker_style": {
+            "size": 6,
+            "color": "#6B5876",
+            "opacity": 1
+        },
+        "text": "Courthouses and Judical",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "detention": {
+        "marker_style": {
+            "size": 6,
+            "color": "#282D3C",
+            "opacity": 1
+        },
+        "text": "Detention and Correctional",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "borough": {
+        "color": "white"
+    },
+    "borough_labels": {
+        "mode": "text",
+        "type": "points"
+    },
+    "community_districts": {
+        "color": "#f8ff99"
+    },
+    "community_districts_labels": {
+        "mode": "text",
+        "type": "points"
+    },
+    "parks": {
+        "color": "#105200"
+    },
+    "parking": {
+        "color": "#808080"
+    },
+    "hurricane": {
+        "color": "#8A2BE2"
+    },
+    "hist_sites": {
+        "marker_style": {
+            "size": 6,
+            "color": "#45B8AC",
+            "opacity": 1
+        },
+        "text": "Historical Sites",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "squirrels": {
+        "marker_style": {
+            "size": 4,
+            "color": "orange",
+            "opacity": 1
+        },
+        "text": "Squirrel",
+        "color": "orange",
+        "center": {
+            "lat": 40.78108498,
+            "lon": -73.9671534
+        },
+        "zoom": 14
+    },
+    "schools": {
+        "marker_style": {
+            "size": 6,
+            "color": "#EFC050",
+            "opacity": 1
+        },
+        "text": "School"
+    },
+    "colleges": {
+        "marker_style": {
+            "size": 6,
+            "color": "#955251",
+            "opacity": 1
+        },
+        "text": "Colleges or Universities",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "youth_services": {
+        "marker_style": {
+            "size": 6,
+            "color": "#B565A7",
+            "opacity": 1
+        },
+        "text": "Colleges or Universities",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "camps": {
+        "marker_style": {
+            "size": 6,
+            "color": "#009B77",
+            "opacity": 1
+        },
+        "text": "Camps",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "libraries": {
+        "marker_style": {
+            "size": 6,
+            "color": "#D65076",
+            "opacity": 1
+        },
+        "text": "Libraries",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "cult": {
+        "marker_style": {
+            "size": 6,
+            "color": "#5B5EA6",
+            "opacity": 1
+        },
+        "text": "Cultural Institutions",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "air_pollution_pm25": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red",
+            "red"
+        ]
+    },
+    "air_pollution_hospitalizations": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red",
+            "red"
+        ]
+    },
+    "air_toxics": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red"
+        ]
+    },
+    "air_pollution_ozone": {
+        "colorscale": [
+            "green",
+            "red"
+        ]
+    },
+    "air_pollution_so2": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red",
+            "red"
+        ]
+    },
+    "air_pollution_no2": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red",
+            "red"
+        ]
+    },
+    "traffic_density": {
+        "colorscale": [
+            "green",
+            "orange",
+            "red",
+            "red"
+        ]
+    },
+    "hospitals": {
+        "marker_style": {
+            "size": 6,
+            "color": "#FFD662",
+            "opacity": 1
+        },
+        "text": "Hospitals and Clinics",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "mental": {
+        "marker_style": {
+            "size": 6,
+            "color": "#DFCFBE",
+            "opacity": 1
+        },
+        "text": "Mental Health",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "residential": {
+        "marker_style": {
+            "size": 6,
+            "color": "#B55A30",
+            "opacity": 1
+        },
+        "text": "Residential Health Care",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "senior": {
+        "marker_style": {
+            "size": 6,
+            "color": "#A0DAA9",
+            "opacity": 1
+        },
+        "text": "Senior Services",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "soup": {
+        "marker_style": {
+            "size": 6,
+            "color": "#755139",
+            "opacity": 1
+        },
+        "text": "Soup Kitchens and Food Pantries",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "bus": {
+        "marker_style": {
+            "size": 6,
+            "color": "#363945",
+            "opacity": 1
+        },
+        "text": "Bus Depots and Terminals",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "railyards": {
+        "marker_style": {
+            "size": 6,
+            "color": "#939597",
+            "opacity": 1
+        },
+        "text": "Rail Yards and Maintenance",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "ports": {
+        "marker_style": {
+            "size": 6,
+            "color": "#E0B589",
+            "opacity": 1
+        },
+        "text": "Ports and Ferry Landings",
+        "colorscale": "Reds",
+        "radius": 2
+    },
+    "airports": {
+        "marker_style": {
+            "size": 6,
+            "color": "#BFD641",
+            "opacity": 1
+        },
+        "text": "Airports and Helicopters",
+        "colorscale": "Reds",
+        "radius": 2
+    }
+}

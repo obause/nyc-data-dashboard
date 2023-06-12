@@ -1,0 +1,279 @@
+{
+    "nypd_precincts": {
+        "name": "NYPD Precincts",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "polygons",
+        "icon": "map:police",
+        "description": "Boundaries of NYPD Police Precincts",
+        "source": "https://data.cityofnewyork.us/Public-Safety/Police-Precincts/78dh-3ptz",
+        "data_period": "2023"
+    },
+    "shootings": {
+        "name": "Shootings",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "mdi:pistol",
+        "description": "List of every shooting incident that occurred in NYC",
+        "source": "https://data.cityofnewyork.us/Public-Safety/NYPD-Shooting-Incident-Data-Historic-/833y-fsy8",
+        "data_period": "2022"
+    },
+    "arrests": {
+        "name": "Arrests",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "density",
+        "icon": "game-icons:handcuffs",
+        "description": "List of every arrest in NYC",
+        "source": "https://data.cityofnewyork.us/Public-Safety/NYPD-Arrests-Data-Historic-/8h9b-rp9u",
+        "data_period": "2022"
+    },
+    "car_accidents": {
+        "name": "Motor vehicle collisions",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "tabler:car-crash",
+        "description": "The Motor Vehicle Collisions data tables contain information from all police reported motor vehicle collisions in NYC. The police report (MV104-AN) is required to be filled out for collisions where someone is injured or killed, or where there is at least $1000 worth of damage",
+        "source": "https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions-Crashes/h9gi-nx95",
+        "data_period": "2022"
+    },
+    "fireservices": {
+        "name": "Fire Services",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "mdi:fire-truck"
+    },
+    "policeservices": {
+        "name": "Police Services",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "mdi:police-station"
+    },
+    "court": {
+        "name": "Courthouses and Judical",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "mdi:court-hammer"
+    },
+    "detention": {
+        "name": "Detention and Correctional",
+        "category": "Public Safety, Emergency Services and Justice",
+        "type": "points",
+        "icon": "game-icons:prisoner"
+    },
+    "borough": {
+        "name": "Boroughs",
+        "category": "Environment",
+        "type": "polygons",
+        "connected_to": "borough_labels",
+        "icon": "mdi:city",
+        "description": "Boundaries of the five boroughs of New York City",
+        "source": "https://data.cityofnewyork.us/City-Government/Borough-Boundaries/tqmj-j8zm",
+        "data_period": "2022"
+    },
+    "borough_labels": {
+        "name": "Boroughs Labels",
+        "category": "hidden",
+        "type": "points"
+    },
+    "community_districts": {
+        "name": "Community Districts",
+        "category": "Environment",
+        "type": "polygons",
+        "connected_to": "community_districts_labels",
+        "icon": "bi:houses-fill",
+        "description": "Boundaries of the 59 community districts that make up NYC",
+        "source": "https://data.cityofnewyork.us/City-Government/Community-Districts/yfnk-k7r4",
+        "data_period": "2023"
+    },
+    "community_districts_labels": {
+        "name": "Community Districts Labels",
+        "category": "hidden",
+        "type": "points"
+    },
+    "parks": {
+        "name": "Parks",
+        "category": "Environment",
+        "type": "polygons",
+        "icon": "material-symbols:park"
+    },
+    "parking": {
+        "name": "Parking Lots",
+        "category": "Environment",
+        "type": "polygons",
+        "icon": "maki:parking-garage"
+    },
+    "hurricane": {
+        "name": "Hurricane Evacuation Zones",
+        "category": "Environment",
+        "type": "polygons",
+        "icon": "bi:hurricane"
+    },
+    "hist_sites": {
+        "name": "Historical Sites",
+        "category": "Environment",
+        "type": "points",
+        "icon": "streamline:travel-places-column-2-pillar-building-historical-column"
+    },
+    "squirrels": {
+        "name": "Squirrels",
+        "category": "Environment",
+        "type": "points",
+        "icon": "lucide:squirrel",
+        "description": "This table contains squirrel data for each of the 3,023 sightings, including location coordinates, age, primary and secondary fur color, elevation, activities, communications, and interactions between squirrels and with humans.",
+        "source": "https://data.cityofnewyork.us/Environment/2018-Central-Park-Squirrel-Census-Squirrel-Data/vfnx-vebw",
+        "data_period": "2018"
+    },
+    "schools": {
+        "name": "Schools",
+        "category": "Education and Youth",
+        "type": "points",
+        "icon": "fa6-solid:school"
+    },
+    "colleges": {
+        "name": "Colleges or Universities",
+        "category": "Education and Youth",
+        "type": "points",
+        "icon": "material-symbols:school"
+    },
+    "youth_services": {
+        "name": "Youth Services",
+        "category": "Education and Youth",
+        "type": "points",
+        "icon": "mdi:man-child"
+    },
+    "camps": {
+        "name": "Camps",
+        "category": "Education and Youth",
+        "type": "points",
+        "icon": "material-symbols:camping"
+    },
+    "libraries": {
+        "name": "Libraries",
+        "category": "Libraries and Cultural Programs",
+        "type": "points",
+        "icon": "clarity:library-solid"
+    },
+    "cult": {
+        "name": "Cultural Institutions",
+        "category": "Libraries and Cultural Programs",
+        "type": "points",
+        "icon": ""
+    },
+    "air_pollution_pm25": {
+        "name": "Air Pollution - Fine Particulate Matter (PM2.5)",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Fine Particulate Matter (PM2.5)<br>Measure: Mean in mcg per cubic meter",
+        "source": "https://data.cityofnewyork.us/Environment/Air-Quality/c3uy-2p5r",
+        "data_period": "Annual Average 2020"
+
+    },
+    "air_pollution_hospitalizations": {
+        "name": "Air Pollution - Hospitalizations",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Hospitalizations for Asthma and COPD<br>Measure: Estimated Annual Rate per 100,000 adults",
+        "source": "https://data.cityofnewyork.us/Health/Hospitalizations-for-Asthma-and-COPD/6kyu-qv6d",
+        "data_period": "2015-2017"
+    },
+    "air_toxics": {
+        "name": "Air Toxics Concentration",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Air Toxics Concentrations- Average Benzene Concentrations<br>Measure: Annual Average Concentration in µg/m3",
+        "source": "https://data.cityofnewyork.us/Environment/Air-Quality/c3uy-2p5r",
+        "data_period": "2011"
+    },
+    "air_pollution_ozone": {
+        "name": "Air Pollution - Ozone (O3)",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Ozone (O3)<br>Measure: Mean in parts per billion (ppb)",
+        "source": "https://data.cityofnewyork.us/Environment/Air-Quality/c3uy-2p5r",
+        "data_period": "Summer 2020"
+    },
+    "air_pollution_so2": {
+        "name": "Air Pollution - Sulfur Dioxide (SO2)",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Sulfur Dioxide (SO2)<br>Measure: Mean in parts per billion (ppb)",
+        "source": "https://data.cityofnewyork.us/Environment/Air-Quality/c3uy-2p5r",
+        "data_period": "Winter 2015-16"
+    },
+    "air_pollution_no2": {
+        "name": "Air Pollution - Notrogen Dioxide (NO2)",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "game-icons:poison-cloud",
+        "description": "Nitrogen Dioxide (NO2)<br>Measure: Mean in parts per billion (ppb)",
+        "source": "https://data.cityofnewyork.us/Environment/Air-Quality/c3uy-2p5r",
+        "data_period": "Summer 2020"
+    },
+    "traffic_density": {
+        "name": "Traffic Density",
+        "category": "Health and Human Services",
+        "type": "choropleth",
+        "icon": "material-symbols:traffic",
+        "description": "Traffic Density- Annual Vehicle Miles Traveled<br>Measure: million miles per km2",
+        "source": "https://data.cityofnewyork.us/Transportation/Traffic-Volume-Counts-2014-2018-/ertz-hr4r",
+        "data_period": "2016"
+    },
+    "hospitals": {
+        "name": "Hospitals and Clinics",
+        "category": "Health and Human Services",
+        "type": "points",
+        "icon": "ri:hospital-fill"
+    },
+    "mental": {
+        "name": "Mental Health",
+        "category": "Health and Human Services",
+        "type": "points",
+        "icon": "ri:mental-health-fill"
+    },
+    "residential": {
+        "name": "Residential Health Care",
+        "category": "Health and Human Services",
+        "type": "points",
+        "icon": "map:health"
+    },
+    "senior": {
+        "name": "Senior Services",
+        "category": "Health and Human Services",
+        "type": "points",
+        "icon": "tabler:old"
+    },
+    "soup": {
+        "name": "Soup Kitchens and Food Pantries",
+        "category": "Health and Human Services",
+        "type": "points",
+        "icon": "material-symbols:food-bank"
+    },
+    "bus": {
+        "name": "Bus Depots and Terminals",
+        "category": "Transportation",
+        "type": "points",
+        "icon": "fluent-emoji-high-contrast:bus"
+    },
+    "railyards": {
+        "name": "Rail Yards and Maintenance",
+        "category": "Transportation",
+        "type": "points",
+        "icon": "maki:rail"
+    },
+    "ports": {
+        "name": "Ports and Ferry Landings",
+        "category": "Transportation",
+        "type": "points",
+        "icon": "streamline:travel-places-anchor-anchor-marina-harbor-port"
+    },
+    "airports": {
+        "name": "Airports and Helicopters",
+        "category": "Transportation",
+        "type": "points",
+        "icon": "maki:airport"
+    }
+}

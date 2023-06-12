@@ -37,6 +37,11 @@ h1 {
   max-width: 10000px;
 }
 
+.map {
+  overflow: hidden;
+  border-radius: 25px;
+}
+
 /*
 .checklist label {
     font-family: Helvetica;

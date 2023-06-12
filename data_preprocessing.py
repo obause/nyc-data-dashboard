@@ -85,20 +85,23 @@ def get_car_accident_data():
     car_accidents = pd.read_csv('data/crime/car_accidents_2022.csv')
     return car_accidents
 
-def get_air_quality_data(measure_name, time_period='Annual Average 2020'):
+def get_air_quality_data(measure_name='All', time_period='All'):
     air_quality = pd.read_csv("data/social/NYCgov_Air_Quality.csv")
-    air_quality = air_quality[air_quality['Name'] == measure_name]
-    nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
-    pd_by_cm = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == time_period)]
+    if measure_name != 'All':   
+        air_quality = air_quality[air_quality['Name'] == measure_name]
+    #nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
+    if time_period != 'All':
+        air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == time_period)]
+    else:
+        air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42')]
     #pd_by_cm = pd.merge(air_quality, nyc_cd, left_on='Geo Join ID', right_on='BoroCD')
-    pd_by_cm['Name'].unique()
-    nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
-    gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
-    gdf.drop('the_geom', axis=1, inplace=True)
-    multipolygon_json = json.loads(gdf.to_json())
-    gdf = gdf.set_index('BoroCD')
+    #nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
+    #gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
+    #gdf.drop('the_geom', axis=1, inplace=True)
+    #multipolygon_json = json.loads(gdf.to_json())
+    #gdf = gdf.set_index('BoroCD')
     
-    return multipolygon_json, pd_by_cm
+    return air_quality
     
 def get_cd_demographic_data():
     demo_ages = pd.read_csv("data/social/cd_demographic_age_gender.csv")
