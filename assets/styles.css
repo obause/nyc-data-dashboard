@@ -42,6 +42,10 @@ h1 {
   border-radius: 25px;
 }
 
+.map-filter {
+  padding-bottom: 20px;
+}
+
 /*
 .checklist label {
     font-family: Helvetica;

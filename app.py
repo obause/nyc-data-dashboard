@@ -560,6 +560,8 @@ def update_cd_indicators(selected_cd):
             #domain = {'x': [0, 0.5], 'y': [0, 0.5]},
             #delta = {'reference': 400, 'relative': True, 'position' : "top"}
         ))
+    # set min max y axis
+    fig.update_yaxes(range=[1000, 4000])
     return fig
 
 
@@ -587,22 +589,25 @@ def update_line_chart(selected_year):
     for borough in df_filtered['Borough'].unique():
         df_filtered_borough = df_filtered[df_filtered['Borough'] == borough]
         linewidth = 1
+        dash = 'solid'
         if borough == 'New York City':
             linewidth = 4
+            dash = 'dash'
         fig.add_trace(go.Scatter(
             x=df_filtered_borough[x_axis], 
             y=df_filtered_borough["Rent"], 
             name=borough, 
             mode='lines',
             connectgaps=True,
-            line=dict(width=linewidth)
+            line=dict(width=linewidth, dash=dash),
             ))
         
     fig.update_layout(
         title="Average Rent Prices Of 1 Bedroom Apartments",
         xaxis_title = xaxis_label,  
         yaxis_title = yaxis_label,
-        title_x=0.5
+        title_x=0.5,
+        transition_duration=500,
     )  
     return fig
 
@@ -626,7 +631,7 @@ def update_stacked(selected_year):
                      title="Distribution of Age")
     
     fig.update_layout(
-        title_x=0.5
+        title_x=0.5,
     )
     return fig
 
@@ -683,7 +688,7 @@ def update_radar(selected_year):
                     title="Detailed Overview of Boroughs",
                    )
     fig.update_layout(
-        title_x=0.5
+        title_x=0.5,
     )
     return fig
 
@@ -783,6 +788,7 @@ app.layout = dbc.Container([
                     #orientation="horizontal",
                     #offset="md",
                     #mb=10,
+                    className="map-filter",
                 ),
                 dmc.Text(id="chips-values-output"),
             ], width=9), #style={'padding': 10, 'flex': 1})
@@ -820,7 +826,7 @@ app.layout = dbc.Container([
                     )
                 ),
                 dbc.Row([
-                        dbc.Col(
+                        dbc.Col([
                             dcc.Dropdown(
                                 id="dropdown",
                                 options=[
@@ -841,9 +847,9 @@ app.layout = dbc.Container([
                                     {"label": "2023", "value": 2023},
                                 ],
                                 value=20,
-                            ), width={"size": 2, "offset": 6}
+                            )], width=4
                         ),
-                    ], className="mt-4",
+                    ], justify="center"
                 ),
             ],
             shadow="xl",
@@ -873,8 +879,8 @@ app.layout = dbc.Container([
                                     2: {'label': '2018', 'style': {'color': '#77b0b1'}},
                                     3: {'label': '2022', 'style': {'color': '#77b0b1'}},
                                 }, included=False
-                        ), width={"size": 5, "offset": 4}
-                    )
+                        ), width={"size": 5}
+                    ), justify="center"
                 ),
             ], shadow="xl", p='xs', radius='md'
         ),
