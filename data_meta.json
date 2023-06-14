@@ -195,7 +195,7 @@
         "name": "Cultural Institutions",
         "category": "Libraries and Cultural Programs",
         "type": "points",
-        "icon": "",
+        "icon": "mdi:theatre",
         "description": "List of all Cultural Institutions that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
         "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
         "data_period": "2022"
@@ -247,7 +247,7 @@
         "data_period": "Winter 2015-16"
     },
     "air_pollution_no2": {
-        "name": "Air Pollution - Notrogen Dioxide (NO2)",
+        "name": "Air Pollution - Nitrogen Dioxide (NO2)",
         "category": "Health and Human Services",
         "type": "choropleth",
         "icon": "game-icons:poison-cloud",

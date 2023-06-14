@@ -302,9 +302,22 @@ def set_filter_options(selected_category, selected_filters):
     else:
         if selected_filters is not None:
             #options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
-            options += [dmc.Chip(filter_options[i]['name'], value=i, variant="outline") for i in selected_filters]
+            options += [
+                dmc.Chip([
+                    DashIconify(
+                            icon=value.get('icon', 'fa:circle'),
+                            width=17,
+                            height=17,
+                            inline=True,
+                            style={"marginRight": 5},
+                            #color=icon_color,
+                            ),
+                    filter_options[i]['name']
+                ], value=i, variant="outline") for i in selected_filters
+            ]
         #options += [{'label': 'All', 'value': 'All'}]
         for key, value in filter_options.items():
+            #icon_color = data_dict[key].get('color', 'black') if data_dict[key].get('type') == 'points' else 'black'
             if selected_category == value['category']:
                 #options += [{'label': value['name'], 'value': key}]
                 options.append(
@@ -314,7 +327,9 @@ def set_filter_options(selected_category, selected_filters):
                             width=17,
                             height=17,
                             inline=True,
-                            style={"marginRight": 5},),
+                            style={"marginRight": 5},
+                            #color=icon_color,
+                            ),
                         value['name'], 
                         ],
                         value=key, 
@@ -422,7 +437,8 @@ def update_map(filter_values):
 @app.callback(
     Output('map-click-data', 'children'),
     Input('map', 'clickData'),
-    State('map-filter', 'value'))
+    State('map-filter', 'value')
+    )
 def display_click_data(clickData, state):
     print("clickData: ", clickData)
     print("state: ", state)
@@ -560,8 +576,6 @@ def update_cd_indicators(selected_cd):
             #domain = {'x': [0, 0.5], 'y': [0, 0.5]},
             #delta = {'reference': 400, 'relative': True, 'position' : "top"}
         ))
-    # set min max y axis
-    fig.update_yaxes(range=[1000, 4000])
     return fig
 
 
@@ -607,7 +621,6 @@ def update_line_chart(selected_year):
         xaxis_title = xaxis_label,  
         yaxis_title = yaxis_label,
         title_x=0.5,
-        transition_duration=500,
     )  
     return fig
 
@@ -687,6 +700,7 @@ def update_radar(selected_year):
                     start_angle=45,
                     title="Detailed Overview of Boroughs",
                    )
+    fig.update_yaxes(range=[1000, 4000])
     fig.update_layout(
         title_x=0.5,
     )
@@ -721,7 +735,7 @@ def drawer_data_details(filter_values):
     Input("data-details-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def drawer_demo(n_clicks):
+def drawer(n_clicks):
     return True
 
 # App layout
