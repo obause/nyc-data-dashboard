@@ -60,7 +60,26 @@ with open('data_meta.json', 'r') as f:
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
-    "schools": {}
+    "schools": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "fireservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "policeservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "court": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "detention": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "hist_sites": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "colleges": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "youth_services": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "camps": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "libraries": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "cult": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "hospitals": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "mental": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "residential": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "senior": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "soup": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "bus": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "railyards": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "ports": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
+    "airports": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'}
 }
 
 # Data loading and preprocessing
