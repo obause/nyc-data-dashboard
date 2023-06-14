@@ -601,9 +601,9 @@ def update_line_chart(selected_year):
             connectgaps=True,
             line=dict(width=linewidth, dash=dash),
             ))
-        
+      
     fig.update_layout(
-        title="Average Rent Prices Of 1 Bedroom Apartments",
+        title="Average Rent Prices of 1 Bedroom Apartments",
         xaxis_title = xaxis_label,  
         yaxis_title = yaxis_label,
         title_x=0.5,

@@ -39,25 +39,37 @@
         "name": "Fire Services",
         "category": "Public Safety, Emergency Services and Justice",
         "type": "points",
-        "icon": "mdi:fire-truck"
+        "icon": "mdi:fire-truck",
+        "description": "List of all Fire Services that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "policeservices": {
         "name": "Police Services",
         "category": "Public Safety, Emergency Services and Justice",
         "type": "points",
-        "icon": "mdi:police-station"
+        "icon": "mdi:police-station",
+        "description": "List of all Police Services that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "court": {
         "name": "Courthouses and Judical",
         "category": "Public Safety, Emergency Services and Justice",
         "type": "points",
-        "icon": "mdi:court-hammer"
+        "icon": "mdi:court-hammer",
+        "description": "List of all Courthouses that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "detention": {
         "name": "Detention and Correctional",
         "category": "Public Safety, Emergency Services and Justice",
         "type": "points",
-        "icon": "game-icons:prisoner"
+        "icon": "game-icons:prisoner",
+        "description": "List of all Detention and Correctional buildings  that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "borough": {
         "name": "Boroughs",
@@ -93,25 +105,37 @@
         "name": "Parks",
         "category": "Environment",
         "type": "polygons",
-        "icon": "material-symbols:park"
+        "icon": "material-symbols:park",
+        "description": "Map of all Parks that are managed partially or solely by NYC Parks",
+        "source": "https://data.cityofnewyork.us/Recreation/Parks-Properties-Map/krz2-j7bn",
+        "data_period": "2023"
     },
     "parking": {
         "name": "Parking Lots",
         "category": "Environment",
         "type": "polygons",
-        "icon": "maki:parking-garage"
+        "icon": "maki:parking-garage",
+        "description": "Map of all Parking Lots that are determined by the New York City Government",
+        "source": "https://data.cityofnewyork.us/City-Government/Parking-Lot/h7zy-iq3d",
+        "data_period": "2022"
     },
     "hurricane": {
         "name": "Hurricane Evacuation Zones",
         "category": "Environment",
         "type": "polygons",
-        "icon": "bi:hurricane"
+        "icon": "bi:hurricane",
+        "description": "Map of all Hurricane Evacuation Zones that are determined by the New York City Emergency Management",
+        "source": "https://data.cityofnewyork.us/Public-Safety/Hurricane-Evacuation-Zones/uihr-hn7s",
+        "data_period": "2023"
     },
     "hist_sites": {
         "name": "Historical Sites",
         "category": "Environment",
         "type": "points",
-        "icon": "streamline:travel-places-column-2-pillar-building-historical-column"
+        "icon": "streamline:travel-places-column-2-pillar-building-historical-column",
+        "description": "List of all Historical Sites that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "squirrels": {
         "name": "Squirrels",
@@ -126,37 +150,55 @@
         "name": "Schools",
         "category": "Education and Youth",
         "type": "points",
-        "icon": "fa6-solid:school"
+        "icon": "fa6-solid:school",
+        "description": "List of all Schools that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "colleges": {
         "name": "Colleges or Universities",
         "category": "Education and Youth",
         "type": "points",
-        "icon": "material-symbols:school"
+        "icon": "material-symbols:school",
+        "description": "List of all Colleges that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "youth_services": {
         "name": "Youth Services",
         "category": "Education and Youth",
         "type": "points",
-        "icon": "mdi:man-child"
+        "icon": "mdi:man-child",
+        "description": "List of all Youth Services that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "camps": {
         "name": "Camps",
         "category": "Education and Youth",
         "type": "points",
-        "icon": "material-symbols:camping"
+        "icon": "material-symbols:camping",
+        "description": "List of all Camps that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "libraries": {
         "name": "Libraries",
         "category": "Libraries and Cultural Programs",
         "type": "points",
-        "icon": "clarity:library-solid"
+        "icon": "clarity:library-solid",
+        "description": "List of all Libraries that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "cult": {
         "name": "Cultural Institutions",
         "category": "Libraries and Cultural Programs",
         "type": "points",
-        "icon": ""
+        "icon": "",
+        "description": "List of all Cultural Institutions that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "air_pollution_pm25": {
         "name": "Air Pollution - Fine Particulate Matter (PM2.5)",
@@ -226,54 +268,81 @@
         "name": "Hospitals and Clinics",
         "category": "Health and Human Services",
         "type": "points",
-        "icon": "ri:hospital-fill"
+        "icon": "ri:hospital-fill",
+        "description": "List of all Hospitals and Clinics that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "mental": {
         "name": "Mental Health",
         "category": "Health and Human Services",
         "type": "points",
-        "icon": "ri:mental-health-fill"
+        "icon": "ri:mental-health-fill",
+        "description": "List of all Mental Health Institutions that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "residential": {
         "name": "Residential Health Care",
         "category": "Health and Human Services",
         "type": "points",
-        "icon": "map:health"
+        "icon": "map:health",
+        "description": "List of all Courthouses  that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "senior": {
         "name": "Senior Services",
         "category": "Health and Human Services",
         "type": "points",
-        "icon": "tabler:old"
+        "icon": "tabler:old",
+        "description": "List of all Senior Services that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "soup": {
         "name": "Soup Kitchens and Food Pantries",
         "category": "Health and Human Services",
         "type": "points",
-        "icon": "material-symbols:food-bank"
+        "icon": "material-symbols:food-bank",
+        "description": "List of all Soup Kitchens and Food Pantries that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "bus": {
         "name": "Bus Depots and Terminals",
         "category": "Transportation",
         "type": "points",
-        "icon": "fluent-emoji-high-contrast:bus"
+        "icon": "fluent-emoji-high-contrast:bus",
+        "description": "List of all Bus Depots and Terminals that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "railyards": {
         "name": "Rail Yards and Maintenance",
         "category": "Transportation",
         "type": "points",
-        "icon": "maki:rail"
+        "icon": "maki:rail",
+        "description": "List of all Rail Yards and Maintenance buildings that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "ports": {
         "name": "Ports and Ferry Landings",
         "category": "Transportation",
         "type": "points",
-        "icon": "streamline:travel-places-anchor-anchor-marina-harbor-port"
+        "icon": "streamline:travel-places-anchor-anchor-marina-harbor-port",
+        "description": "List of all Ports and Ferry Landings that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     },
     "airports": {
         "name": "Airports and Helicopters",
         "category": "Transportation",
         "type": "points",
-        "icon": "maki:airport"
+        "icon": "maki:airport",
+        "description": "List of all Airports that are owned, operated, funded, licensed, or certified by a City, State, or Federal agency in the City of New York",
+        "source": "https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5",
+        "data_period": "2022"
     }
 }
