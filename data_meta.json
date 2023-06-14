@@ -20,7 +20,7 @@
     "arrests": {
         "name": "Arrests",
         "category": "Public Safety, Emergency Services and Justice",
-        "type": "density",
+        "type": "points",
         "icon": "game-icons:handcuffs",
         "description": "List of every arrest in NYC",
         "source": "https://data.cityofnewyork.us/Public-Safety/NYPD-Arrests-Data-Historic-/8h9b-rp9u",

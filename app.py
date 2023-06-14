@@ -60,6 +60,7 @@ with open('data_meta.json', 'r') as f:
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
+    "arrests": {'OFNS_DESC': 'Description', 'ARREST_PRECINCT': 'Precinct', 'AGE_GROUP': 'Age Group', 'PERP_SEX': 'Sex', 'PERP_RACE': 'Ethnicity', 'year': 'Year', 'month': 'Month', 'day': 'Day'},
     "schools": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
     "fireservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
     "policeservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
@@ -509,7 +510,7 @@ cd_indicators = get_cd_indicators()
     Input('cd-dropdown', 'value'))
 def update_cd_demo(cd):
     if cd is None:
-        return go.Figure()
+        cd = 201
     print("selected cd: ", cd)
     filtered_df = demo_ages_cd[demo_ages_cd["cd_number"] == cd]
     #filtered_df.drop(columns=['cd_number'], inplace=True)
@@ -534,6 +535,7 @@ def update_cd_demo(cd):
         width=500,
         bargap=0.50,
         margin = {'l':0, 'r':0, 'b':0, 't':0},
+        title='Population by Age and Gender'
     )
     fig.update_traces(width=0.4)
     #fig.for_each_annotation(lambda a: a.update(text=""))
@@ -580,21 +582,62 @@ def update_cd_map(selected_cd):
     Input('cd-dropdown', 'value'))
 def update_cd_indicators(selected_cd):
     if selected_cd is None:
-        return None
-    
+        selected_cd = 201
+    print("selected cd: ", selected_cd)
     filtered_df = cd_indicators[cd_indicators["cd_number"] == selected_cd]
-    
+
     fig = go.Figure()
-    for col in filtered_df.columns[3:]:
-        print("col: ", col)
-        print("value: ", filtered_df[col].values[0])
-        fig.add_trace(go.Indicator(
-            mode = "number",
-            value = filtered_df[col].values[0],
-            title={"text": col},
-            #domain = {'x': [0, 0.5], 'y': [0, 0.5]},
-            #delta = {'reference': 400, 'relative': True, 'position' : "top"}
-        ))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Foreign-Born Population<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of residents are foreign-born</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['pct_foreign_born'].values[0],
+        domain = {'row': 0, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Unemployment<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of unemployed residents</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['unemployment'].values[0],
+        domain = {'row': 0, 'column': 1}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Commute to Work<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>mean in minutes</span>"},
+        mode = "number",
+        number = {'suffix': "min"},
+        value = filtered_df['mean_commute'].values[0],
+        domain = {'row': 3, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "English Proficiency<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% having limited English proficiency</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['lep_rate'].values[0],
+        domain = {'row': 3, 'column': 1}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Poverty Measure<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of incomes below poverty threshold</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['poverty_rate'].values[0],
+        domain = {'row': 6, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Rent Burden<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of households spend 35%<br>or more of their income on rent</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['pct_hh_rent_burd'].values[0],
+        domain = {'row': 6, 'column': 1}))
+
+    fig.update_layout(
+        grid = {'rows': 7, 'columns': 2, 'pattern': "independent"},
+        template = {'data' : {'indicator': [{
+            'title': {'text': "Speed"},
+            'mode' : "number+delta+gauge",
+            'delta' : {'reference': 90}}]
+                            }},    
+        )
     return fig
 
 
@@ -722,6 +765,7 @@ def update_radar(selected_year):
     fig.update_yaxes(range=[1000, 4000])
     fig.update_layout(
         title_x=0.5,
+        yaxis_range=[1000,4000]
     )
     return fig
 
@@ -744,7 +788,8 @@ def drawer_data_details(filter_values):
                 dmc.Text('Data Description:', weight=500),
                 dmc.Text(filter_options[filter_value].get('description')),
                 dmc.Text(f"Data period: {filter_options[filter_value].get('data_period')}", color='dimmed'),
-                dmc.Text(f"Source: <a href={filter_options[filter_value].get('source')}>{filter_options[filter_value].get('source')}</a>", size='sm'),
+                dmc.Text("Source:"),
+                html.A(filter_options[filter_value].get('source'), href=filter_options[filter_value].get('source')),
                 dmc.Divider(variant="solid"),
             ]
     return content
@@ -812,7 +857,7 @@ app.layout = dbc.Container([
                 ),
             ], width=3),
             dbc.Col([
-                dmc.Text("Select a filter", weight=500),
+                dmc.Text("Select filter", weight=500),
                 dmc.ChipGroup(
                     id="map-filter",
                     multiple=True,
@@ -938,7 +983,7 @@ app.layout = dbc.Container([
                         figure=fig_cd_map
                     ),
                     
-                ], width=4),
+                ], width=3),
                 dbc.Col([
                     dcc.Graph(
                         id='cd-demographics',
@@ -949,7 +994,7 @@ app.layout = dbc.Container([
                     dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
                         mode = "number",
                         value = 0,))),
-                ], width=4),
+                ], width=5),
             ]),
             ], shadow="xl", p='xs', radius='md'
         ),
