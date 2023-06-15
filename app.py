@@ -322,19 +322,20 @@ def set_filter_options(selected_category, selected_filters):
     else:
         if selected_filters is not None:
             #options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
-            options += [
-                dmc.Chip([
-                    DashIconify(
-                            icon=value.get('icon', 'fa:circle'),
-                            width=17,
-                            height=17,
-                            inline=True,
-                            style={"marginRight": 5},
-                            #color=icon_color,
-                            ),
-                    filter_options[i]['name']
-                ], value=i, variant="outline") for i in selected_filters
-            ]
+            for i in selected_filters:
+                options.append(
+                    dmc.Chip([
+                        DashIconify(
+                                icon=filter_options[i].get('icon', 'fa:circle'),
+                                width=17,
+                                height=17,
+                                inline=True,
+                                style={"marginRight": 5},
+                                #color=icon_color,
+                                ),
+                        filter_options[i]['name']
+                    ], value=i, variant="outline")
+                )
         #options += [{'label': 'All', 'value': 'All'}]
         for key, value in filter_options.items():
             #icon_color = data_dict[key].get('color', 'black') if data_dict[key].get('type') == 'points' else 'black'
