@@ -19,7 +19,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from data_preprocessing import *
+import data_preprocessing
 
 
 logger = logging.getLogger(__name__)
@@ -36,27 +36,31 @@ COLORS = {
     'text': '#000'
 }
 
-styles = {
-    'pre': {
-        'border': 'thin lightgrey solid',
-        'overflowX': 'scroll'
-    }
-}
-
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
-#bs = 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'
+# Initialization of the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBORG
+app.logger.info("-------------------------------------------")
+app.logger.info("App initialized")
 
+map_categories = [
+    'Environment', 
+    'Public Safety, Emergency Services and Justice', 
+    'Education and Youth', 
+    'Libraries and Cultural Programs', 
+    'Health and Human Services', 
+    'Transportation']
 
-map_categories = ['Environment', 'Public Safety, Emergency Services and Justice', 'Education and Youth', 'Libraries and Cultural Programs', 'Health and Human Services', 'Transportation']
+# Load metadata
+try:
+    with open('data_dict.json', 'r') as f:
+        data_dict = json.load(f)
+    with open('data_meta.json', 'r') as f:
+        filter_options = json.load(f)
+except Exception as e:
+    app.logger.error("Error occured loading metadata:" + e)
 
-# save data_dict as json file
-with open('data_dict.json', 'r') as f:
-    data_dict = json.load(f)
-with open('data_meta.json', 'r') as f:
-    filter_options = json.load(f)
-
+# TODO: Add more
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
@@ -82,42 +86,44 @@ attributes = {
     "airports": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'}
 }
 
-# Data loading and preprocessing
-borough_mapping = get_borough_mappings()
+app.logger.info("Loading and preprocessing data...")
+data_loading_start = time.time()
 
-nyc_parks_geo = get_park_geodata()
+# Data loading and preprocessing
+borough_mapping = data_preprocessing.get_borough_mappings()
+
+nyc_parks_geo = data_preprocessing.get_park_geodata()
 data_dict['parks']['data'] = nyc_parks_geo
-nypd_precincts_geo = get_nypd_precincts_geodata()
+nypd_precincts_geo = data_preprocessing.get_nypd_precincts_geodata()
 data_dict['nypd_precincts']['data'] = nypd_precincts_geo
-community_districts_geo = get_community_districts_geodata()
+community_districts_geo = data_preprocessing.get_community_districts_geodata()
 data_dict['community_districts']['data'] = community_districts_geo
 
-
-nyc_crime_shootings = get_crime_shootings()
+nyc_crime_shootings = data_preprocessing.get_crime_shootings()
 data_dict['shootings']['data'] = nyc_crime_shootings
-nyc_crime_arrests = get_crime_arrests()
+nyc_crime_arrests = data_preprocessing.get_crime_arrests()
 data_dict['arrests']['data'] = nyc_crime_arrests
 data_dict['arrests']['text'] = nyc_crime_arrests['OFNS_DESC']
 
-squirrels = get_squirrels()
+squirrels = data_preprocessing.get_squirrels()
 data_dict['squirrels']['data'] = squirrels
 
-hospitals = get_hospital_data()
+hospitals = data_preprocessing.get_hospital_data()
 data_dict['hospitals']['data'] = hospitals
 data_dict['hospitals']['text'] = hospitals['Facility Name']
 
-car_accidents = get_car_accident_data()
+car_accidents = data_preprocessing.get_car_accident_data()
 data_dict['car_accidents']['data'] = car_accidents
 data_dict['car_accidents']['text'] = car_accidents['CONTRIBUTING FACTOR VEHICLE 1']
 
-nyc_borough_geo = get_borough_geodata()
+nyc_borough_geo = data_preprocessing.get_borough_geodata()
 data_dict['borough']['data'] = nyc_borough_geo
-nyc_borough_mapping = get_borough_mappings()
+nyc_borough_mapping = data_preprocessing.get_borough_mappings()
 data_dict['borough_labels']['data'] = nyc_borough_mapping
 data_dict['borough_labels']['text'] = nyc_borough_mapping['borough_name']
 
 
-df_air = get_air_quality_data()
+df_air = data_preprocessing.get_air_quality_data()
 air_quality_measures = {
     'air_pollution_pm25': {'measure_name': 'Fine Particulate Matter (PM2.5)', 'time_period': 'Annual Average 2020'},
     'air_pollution_hospitalizations': {'measure_name': 'PM2.5-Attributable Respiratory Hospitalizations (Adults 20 Yrs and Older)', 'time_period': '2015-2017'},    
@@ -135,103 +141,115 @@ for key, value in air_quality_measures.items():
     data_dict[key]['values'] = df_air_filtered['Data Value']
     data_dict[key]['geodata'] = community_districts_geo
 
-community_districts_geodf = get_community_districts_geodf()
+community_districts_geodf = data_preprocessing.get_community_districts_geodf()
 data_dict['community_districts_labels']['data'] = community_districts_geodf
 data_dict['community_districts_labels']['data'] = community_districts_geodf
 data_dict['community_districts_labels']['text'] = community_districts_geodf['displayname']
 
-df_radar_2022, df_radar_2018, df_radar_2015 = get_measures_radar()
-df_stacked_2022, df_stacked_2018, df_stacked_2015 = get_measures_stacked()
-df_timeline = get_timeline()
+df_radar_2022, df_radar_2018, df_radar_2015 = data_preprocessing.get_measures_radar()
+df_stacked_2022, df_stacked_2018, df_stacked_2015 = data_preprocessing.get_measures_stacked()
+df_timeline = data_preprocessing.get_timeline()
 
-df_schools = get_facilities(facgroup = 'SCHOOLS (K-12)')
+nypd_parking_geo = data_preprocessing.get_parking_geodata()
+data_dict['parking']['data'] = nypd_parking_geo
+
+nypd_hurricane_geo = data_preprocessing.get_hurricane_geodata()
+data_dict['hurricane']['data'] = nypd_hurricane_geo
+
+boro_indicators = data_preprocessing.get_nyc_borough_indicators()
+demo_ages_cd = data_preprocessing.get_cd_demographic_data()
+cd_indicators = data_preprocessing.get_cd_indicators()
+
+df_facilities = data_preprocessing.load_facility_dataset()
+df_schools = data_preprocessing.get_facilities(df=df_facilities, facgroup = 'SCHOOLS (K-12)')
 data_dict['schools']['data'] = df_schools
 data_dict['schools']['text'] = df_schools['facname'] 
 
-df_colleges = get_facilities(facsubgrp = 'COLLEGES OR UNIVERSITIES')
+df_colleges = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'COLLEGES OR UNIVERSITIES')
 data_dict['colleges']['data'] = df_colleges
 data_dict['colleges']['text'] = df_colleges['facname'] 
 
-df_hist_sites = get_facilities(facsubgrp = 'HISTORICAL SITES')
+df_hist_sites = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'HISTORICAL SITES')
 data_dict['hist_sites']['data'] = df_hist_sites
 data_dict['hist_sites']['text'] = df_hist_sites['facname'] 
 
-df_youth_services = get_facilities(facgroup = 'YOUTH SERVICES')
+df_youth_services = data_preprocessing.get_facilities(df=df_facilities, facgroup = 'YOUTH SERVICES')
 data_dict['youth_services']['data'] = df_youth_services
 data_dict['youth_services']['text'] = df_youth_services['facname'] 
 
-df_camps = get_facilities(facgroup = 'CAMPS')
+df_camps = data_preprocessing.get_facilities(df=df_facilities, facgroup = 'CAMPS')
 data_dict['camps']['data'] = df_camps
 data_dict['camps']['text'] = df_camps['facname'] 
 
-df_libraries = get_facilities(facgroup = 'LIBRARIES')
+df_libraries = data_preprocessing.get_facilities(df=df_facilities, facgroup = 'LIBRARIES')
 data_dict['libraries']['data'] = df_libraries
 data_dict['libraries']['text'] = df_libraries['facname'] 
 
-df_cult = get_facilities(facgroup = 'CULTURAL INSTITUTIONS')
+df_cult = data_preprocessing.get_facilities(df=df_facilities, facgroup = 'CULTURAL INSTITUTIONS')
 data_dict['cult']['data'] = df_cult
 data_dict['cult']['text'] = df_cult['facname'] 
 
-df_hospitals = get_facilities(facsubgrp = 'HOSPITALS AND CLINICS')
+df_hospitals = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'HOSPITALS AND CLINICS')
 data_dict['hospitals']['data'] = df_hospitals
 data_dict['hospitals']['text'] = df_hospitals['facname'] 
 
-df_mental = get_facilities(facsubgrp = 'MENTAL HEALTH')
+df_mental = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'MENTAL HEALTH')
 data_dict['mental']['data'] = df_mental
 data_dict['mental']['text'] = df_mental['facname'] 
 
-df_residential = get_facilities(facsubgrp = 'RESIDENTIAL HEALTH CARE')
+df_residential = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'RESIDENTIAL HEALTH CARE')
 data_dict['residential']['data'] = df_residential
 data_dict['residential']['text'] = df_residential['facname'] 
 
-df_senior = get_facilities(facsubgrp = 'SENIOR SERVICES')
+df_senior = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'SENIOR SERVICES')
 data_dict['senior']['data'] = df_senior
 data_dict['senior']['text'] = df_senior['facname'] 
 
-df_soup = get_facilities(facsubgrp = 'SOUP KITCHENS AND FOOD PANTRIES')
+df_soup = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'SOUP KITCHENS AND FOOD PANTRIES')
 data_dict['soup']['data'] = df_soup
 data_dict['soup']['text'] = df_soup['facname'] 
 
-df_bus = get_facilities(facsubgrp = 'BUS DEPOTS AND TERMINALS')
+df_bus = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'BUS DEPOTS AND TERMINALS')
 data_dict['bus']['data'] = df_bus
 data_dict['bus']['text'] = df_bus['facname'] 
 
-df_railyards = get_facilities(facsubgrp = 'RAIL YARDS AND MAINTENANCE')
+df_railyards = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'RAIL YARDS AND MAINTENANCE')
 data_dict['railyards']['data'] = df_railyards
 data_dict['railyards']['text'] = df_railyards['facname']
 
-df_ports = get_facilities(facsubgrp = 'PORTS AND FERRY LANDINGS')
+df_ports = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'PORTS AND FERRY LANDINGS')
 data_dict['ports']['data'] = df_ports
 data_dict['ports']['text'] = df_ports['facname']
 
-df_airports = get_facilities(facsubgrp = 'AIRPORTS AND HELIPORTS')
+df_airports = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'AIRPORTS AND HELIPORTS')
 data_dict['airports']['data'] = df_airports
 data_dict['airports']['text'] = df_airports['facname']
 
-df_fireservices = get_facilities(facsubgrp = 'FIRE SERVICES')
+df_fireservices = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'FIRE SERVICES')
 data_dict['fireservices']['data'] = df_fireservices
 data_dict['fireservices']['text'] = df_fireservices['facname']
 
-df_policeservices = get_facilities(facsubgrp = 'POLICE SERVICES')
+df_policeservices = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'POLICE SERVICES')
 data_dict['policeservices']['data'] = df_policeservices
 data_dict['policeservices']['text'] = df_policeservices['facname']
 
-df_court = get_facilities(facsubgrp = 'COURTHOUSES AND JUDICIAL')
+df_court = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'COURTHOUSES AND JUDICIAL')
 data_dict['court']['data'] = df_court
 data_dict['court']['text'] = df_court['facname']
 
-df_detention = get_facilities(facsubgrp = 'DETENTION AND CORRECTIONAL')
+df_detention = data_preprocessing.get_facilities(df=df_facilities, facsubgrp = 'DETENTION AND CORRECTIONAL')
 data_dict['detention']['data'] = df_detention
 data_dict['detention']['text'] = df_detention['facname']
 
-nypd_parking_geo = get_parking_geodata()
-data_dict['parking']['data'] = nypd_parking_geo
+elapsed_time = time.time() - data_loading_start
+app.logger.info('Data loading time: {} seconds'.format(time.strftime("%H:%M:%S", time.gmtime(elapsed_time))))
 
-nypd_hurricane_geo = get_hurricane_geodata()
-data_dict['hurricane']['data'] = nypd_hurricane_geo
+number_of_datasets = len(data_dict.keys())
+app.logger.info('Successfully loaded {} datasets'.format(number_of_datasets))
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
+# Base initialization of figures
 fig_map = go.Figure(go.Scattermapbox())
 
 fig_map.update_layout(
@@ -273,7 +291,7 @@ fig_cd_map.update_layout(
         height=400,
     )
 
-boro_indicators = get_nyc_borough_indicators()
+
 categories = [
     'Age under 18', 
     'Age 65 & Over',
@@ -305,6 +323,7 @@ fig_radar.update_layout(
 )
 fig_radar_bar = go.Figure(go.Bar())
 
+############# Callbacks #############
 
 # Generate Filter Options
 @app.callback(
@@ -312,15 +331,13 @@ fig_radar_bar = go.Figure(go.Bar())
     Input('map-category', 'value'),
     State('map-filter', 'value'))
 def set_filter_options(selected_category, selected_filters):
-    print("Selected category: ", selected_category)
+    app.logger.debug("Selected category: ", selected_category)
     
-    #return [{'label': i, 'value': i} for i in filter_options[selected_category]].keys() + [{'label': 'All', 'value': 'All'}]
     options = []
     if selected_category is None:
         return options
     else:
         if selected_filters is not None:
-            #options += [{'label': filter_options[i]['name'], 'value': i} for i in selected_filters]
             options += [
                 dmc.Chip([
                     DashIconify(
@@ -334,11 +351,9 @@ def set_filter_options(selected_category, selected_filters):
                     filter_options[i]['name']
                 ], value=i, variant="outline") for i in selected_filters
             ]
-        #options += [{'label': 'All', 'value': 'All'}]
         for key, value in filter_options.items():
             #icon_color = data_dict[key].get('color', 'black') if data_dict[key].get('type') == 'points' else 'black'
             if selected_category == value['category']:
-                #options += [{'label': value['name'], 'value': key}]
                 options.append(
                     dmc.Chip([
                         DashIconify(
@@ -364,8 +379,7 @@ def set_filter_options(selected_category, selected_filters):
     Output('map', 'figure'),
     Input('map-filter', 'value'))
 def update_map(filter_values):
-    print("Filters: {}".format(filter_values))
-    print("type: {}".format(type(filter_values)))
+    app.logger.debug("Selected Filters: {}".format(filter_values))
     
     layers = []
     center = { 'lon': -73.935242, 'lat': 40.730610}
@@ -377,7 +391,7 @@ def update_map(filter_values):
         for filter_value in filter_values:
             if filter_options[filter_value].get('connected_to') is not None:
                 filter_values.append(filter_options[filter_value]['connected_to'])
-                print("Connected to: {}".format(filter_options[filter_value]['connected_to']))
+                app.logger.debug("{} connected to: {}".format(filter_value, filter_options[filter_value]['connected_to']))
             
             if data_dict[filter_value].get('center') is not None:
                 center = data_dict[filter_value]['center']
@@ -398,7 +412,7 @@ def update_map(filter_values):
                 )
                 
             elif filter_options[filter_value]['type'] == 'points':
-                print("is points")
+                app.logger.debug("is points")
                 data = data_dict[filter_value]['data']
                 fig_map.add_trace(go.Scattermapbox(
                     lon = data.Longitude, lat = data.Latitude,
@@ -409,7 +423,7 @@ def update_map(filter_values):
                 ))
                 
             elif filter_options[filter_value]['type'] == 'density':
-                print("is density")
+                app.logger.debug("is density")
                 data = data_dict[filter_value]['data']
                 fig_map.add_trace(go.Densitymapbox(
                     lon = data.Longitude, lat = data.Latitude,
@@ -421,11 +435,11 @@ def update_map(filter_values):
                     ))
                 
             elif filter_options[filter_value]['type'] == 'choropleth':
-                print("is chloropeth")
+                app.logger.debug("is chloropeth")
                 geodata = data_dict[filter_value]['geodata']
                 data = data_dict[filter_value]['data']
                 values = data_dict[filter_value].get('values')
-                print("len values:", len(values))
+
                 fig_map.add_trace(go.Choroplethmapbox(
                     geojson=geodata,
                     locations=data_dict[filter_value].get('locations'),
@@ -459,8 +473,8 @@ def update_map(filter_values):
     State('map-filter', 'value')
     )
 def display_click_data(clickData, state):
-    print("clickData: ", clickData)
-    print("state: ", state)
+    #print("clickData: ", clickData)
+    #print("state: ", state)
     
     if clickData is None:
         return "nothing selected"
@@ -483,12 +497,6 @@ def display_click_data(clickData, state):
         attributes_list = {i: i for i in point_data.keys()}
         selected_attributes = point_data.keys()
     
-    print("attributes_list: ", attributes_list)
-    
-    #content = dash_table.DataTable(
-    #    columns=[{"name": 'attribute', "id": 'attribute'}, {"name": 'value', "id": 'value'}],
-    #    data=[{'attribute': attributes_list[col], 'value': value} for col, value in point_data.items() if col in selected_attributes]
-    #)
     header = [html.Thead(html.Tr([html.Th("Attribute"), html.Th("Value")]))]
     rows = [html.Tr([html.Td(attributes_list[col]), html.Td(str(value).replace("True", "Yes"))]) for col, value in point_data.items() if col in selected_attributes]
     table = [html.Thead(header), html.Tbody(rows)]
@@ -502,8 +510,7 @@ def hide_cd_demo(cd):
         return {'display': 'none'}
     
 
-demo_ages_cd = get_cd_demographic_data()
-cd_indicators = get_cd_indicators()
+
 @app.callback(
     Output('cd-demographics', 'figure'),
     Input('cd-dropdown', 'value'))
@@ -512,7 +519,6 @@ def update_cd_demo(cd):
         return go.Figure()
     print("selected cd: ", cd)
     filtered_df = demo_ages_cd[demo_ages_cd["cd_number"] == cd]
-    #filtered_df.drop(columns=['cd_number'], inplace=True)
     fig = px.bar(
         filtered_df
         #.drop(columns="index")
@@ -523,7 +529,7 @@ def update_cd_demo(cd):
         facet_col_spacing=0.1,
         color="gender",
         color_discrete_sequence=["#472323", "#233147"],
-        labels=get_cd_demographic_legend()
+        labels=data_preprocessing.get_cd_demographic_legend()
     )
     fig.update_layout(
         yaxis2={"side": "right", "matches": None, "showticklabels": False},
@@ -536,7 +542,6 @@ def update_cd_demo(cd):
         margin = {'l':0, 'r':0, 'b':0, 't':0},
     )
     fig.update_traces(width=0.4)
-    #fig.for_each_annotation(lambda a: a.update(text=""))
     fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
     #fig.update_traces(texttemplate="%{y}", textposition="inside")
     return fig
@@ -558,7 +563,6 @@ def update_cd_map(selected_cd):
                         text=community_districts_geodf['displayname'],
                         mode='text',
                     ))
-    print("center: ", center)
     fig_cd_map.update_layout(
         mapbox = {
                 'accesstoken': mapbox_access_token,
@@ -586,14 +590,10 @@ def update_cd_indicators(selected_cd):
     
     fig = go.Figure()
     for col in filtered_df.columns[3:]:
-        print("col: ", col)
-        print("value: ", filtered_df[col].values[0])
         fig.add_trace(go.Indicator(
             mode = "number",
             value = filtered_df[col].values[0],
             title={"text": col},
-            #domain = {'x': [0, 0.5], 'y': [0, 0.5]},
-            #delta = {'reference': 400, 'relative': True, 'position' : "top"}
         ))
     return fig
 
@@ -754,7 +754,7 @@ def drawer_data_details(filter_values):
     Input("data-details-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def drawer(n_clicks):
+def open_drawer(n_clicks):
     return True
 
 # App layout
@@ -766,7 +766,6 @@ app.layout = dbc.Container([
                 children='New York Smart City Dashboard',
                 style={
                     'textAlign': 'center',
-                    #'color': COLORS['text']
                 }
             ),
             
@@ -777,7 +776,6 @@ app.layout = dbc.Container([
                 children='by Ole Bause and Alexander Barkov',
                 style={
                     'textAlign': 'center',
-                    #'color': COLORS['text']
                     },
             className='subtitle'
             ), 
@@ -816,11 +814,6 @@ app.layout = dbc.Container([
                 dmc.ChipGroup(
                     id="map-filter",
                     multiple=True,
-                    #label="Select a filter",
-                    #description="This is anonymous",
-                    #orientation="horizontal",
-                    #offset="md",
-                    #mb=10,
                     className="map-filter",
                 ),
                 dmc.Text(id="chips-values-output"),
@@ -925,8 +918,6 @@ app.layout = dbc.Container([
                     html.Br(),
                     html.Label('Category'),
                     dcc.Dropdown(dropdown_options_cd,
-                                #value=dropdown_options_cd[0],
-                                #multi=True,
                                 id='cd-dropdown'
                                 ), #style={'padding': 10, 'flex': 1}  
                 ], width=4),
@@ -942,7 +933,6 @@ app.layout = dbc.Container([
                 dbc.Col([
                     dcc.Graph(
                         id='cd-demographics',
-                        #figure=fig_cd_map
                     ),
                 ], width=4),
                 dbc.Col([
@@ -955,10 +945,13 @@ app.layout = dbc.Container([
         ),
         html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
     ],fluid=True,),
-], class_name="main-container",fluid=True,) #fluid=True if you want your Container to fill available horizontal space and resize fluidly.
+], class_name="main-container",fluid=True,)
 
 
 
 
 if __name__ == '__main__':
+    app.logger.info("Starting NYC Smart City Dashboard app")
+    
+    app.logger.info("Starting Dash server")
     app.run_server(debug=True, processes=1, threaded=False)
