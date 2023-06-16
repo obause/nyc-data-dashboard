@@ -45,6 +45,7 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 # Initialization of the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBORG
 server = app.server
+app.title = 'NYC Smart City Dashboard'
 app.logger.info("-------------------------------------------")
 app.logger.info("App initialized")
 
@@ -66,7 +67,6 @@ try:
 except Exception as e:
     app.logger.error("Error occured loading metadata:" + e)
 
-# TODO: Add more
 attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
@@ -150,7 +150,6 @@ for key, value in air_quality_measures.items():
     data_dict[key]['geodata'] = community_districts_geo
 
 community_districts_geodf = data_preprocessing.get_community_districts_geodf()
-data_dict['community_districts_labels']['data'] = community_districts_geodf
 data_dict['community_districts_labels']['data'] = community_districts_geodf
 data_dict['community_districts_labels']['text'] = community_districts_geodf['displayname']
 
@@ -536,156 +535,6 @@ def display_click_data(clickData, state):
     table = [html.Thead(header), html.Tbody(rows)]
     return table #json.dumps(clickData, indent=2)
 
-@app.callback(
-    Output('cd-demographics', 'style'),
-    Input('cd-dropdown', 'value'))
-def hide_cd_demo(cd):
-    """Hides the cd demographics graph if no cd is selected.
-
-    Args:
-        cd (str): The community district number.
-
-    Returns:
-        dict: A dictionary containing the style of the graph.
-    """
-    if cd is None:
-        return {'display': 'none'}
-    
-
-
-@app.callback(
-    Output('cd-demographics', 'figure'),
-    Input('cd-dropdown', 'value'))
-def update_cd_demo(cd):
-    if cd is None:
-        cd = 201
-    print("selected cd: ", cd)
-    filtered_df = demo_ages_cd[demo_ages_cd["cd_number"] == cd]
-    fig = px.bar(
-        filtered_df
-        #.drop(columns="index")
-        .assign(group=lambda d: d["gender"].astype(str)),
-        y="age_group",
-        x="value",
-        facet_col="gender",
-        facet_col_spacing=0.1,
-        color="gender",
-        color_discrete_sequence=["#472323", "#233147"],
-        labels=data_preprocessing.get_cd_demographic_legend()
-    )
-    fig.update_layout(
-        yaxis2={"side": "right", "matches": None, "showticklabels": False},
-        yaxis={"side": "right", "showticklabels": True, "title": ""},
-        xaxis={"autorange": "reversed", "title": "Population %"},
-        xaxis2={"matches": None, "title": "Population %"},
-        showlegend=False,
-        width=500,
-        bargap=0.50,
-        margin = {'l':0, 'r':0, 'b':0, 't':0},
-        title='Population by Age and Gender'
-    )
-    fig.update_traces(width=0.4)
-    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
-    #fig.update_traces(texttemplate="%{y}", textposition="inside")
-    return fig
-
-
-#@app.callback(
-#    Output('cd-map', 'figure'),
-#    Input('cd-dropdown', 'value'))
-def update_cd_map(selected_cd):
-    if selected_cd is None:
-        center = [40.730610, -73.935242]
-        zoom = 10
-    else:
-        center = community_districts_geodf[community_districts_geodf['GEOCODE']==selected_cd][['Latitude', 'Longitude']].values[0].tolist()
-        zoom = 12
-    fig_cd_map = go.Figure(go.Scattermapbox())
-    fig_cd_map.add_trace(go.Scattermapbox(
-                        lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
-                        text=community_districts_geodf['displayname'],
-                        mode='text',
-                    ))
-    fig_cd_map.update_layout(
-        mapbox = {
-                'accesstoken': mapbox_access_token,
-                #'style': "stamen-terrain",
-                'center': { 'lon': center[0], 'lat': center[1]},
-                'zoom': zoom, 
-                'layers': [{
-                    'source': community_districts_geo,
-                    'type': "fill", 'below': "traces", 'color': "green", 'opacity': 0.5
-                    }],
-            },
-            margin = {'l':0, 'r':0, 'b':0, 't':0},
-            height=400,
-        )
-    return fig_cd_map
-
-@app.callback(
-    Output('cd-indicators', 'figure'),
-    Input('cd-dropdown', 'value'))
-def update_cd_indicators(selected_cd):
-    if selected_cd is None:
-        selected_cd = 201
-    print("selected cd: ", selected_cd)
-    filtered_df = cd_indicators[cd_indicators["cd_number"] == selected_cd]
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "Foreign-Born Population<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of residents are foreign-born</span>"},
-        mode = "number",
-        number = {'suffix': "%"},
-        value = filtered_df['pct_foreign_born'].values[0],
-        domain = {'row': 0, 'column': 0}))
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "Unemployment<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of unemployed residents</span>"},
-        mode = "number",
-        number = {'suffix': "%"},
-        value = filtered_df['unemployment'].values[0],
-        domain = {'row': 0, 'column': 1}))
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "Commute to Work<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>mean in minutes</span>"},
-        mode = "number",
-        number = {'suffix': "min"},
-        value = filtered_df['mean_commute'].values[0],
-        domain = {'row': 3, 'column': 0}))
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "English Proficiency<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% having limited English proficiency</span>"},
-        mode = "number",
-        number = {'suffix': "%"},
-        value = filtered_df['lep_rate'].values[0],
-        domain = {'row': 3, 'column': 1}))
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "Poverty Measure<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of incomes below poverty threshold</span>"},
-        mode = "number",
-        number = {'suffix': "%"},
-        value = filtered_df['poverty_rate'].values[0],
-        domain = {'row': 6, 'column': 0}))
-
-    fig.add_trace(go.Indicator(
-        title = {"text": "Rent Burden<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of households spend 35%<br>or more of their income on rent</span>"},
-        mode = "number",
-        number = {'suffix': "%"},
-        value = filtered_df['pct_hh_rent_burd'].values[0],
-        domain = {'row': 6, 'column': 1}))
-
-    fig.update_layout(
-        grid = {'rows': 7, 'columns': 2, 'pattern': "independent"},
-        template = {'data' : {'indicator': [{
-            'title': {'text': "Speed"},
-            'mode' : "number+delta+gauge",
-            'delta' : {'reference': 90}}]
-                            }},    
-        )
-    return fig
-
-
 # Update the line chart based on dropdown selection
 @app.callback(
     Output("graph", "figure"),
@@ -838,6 +687,158 @@ def update_radar(selected_year):
     return fig
 
 dropdown_options_cd = [{"label": f"{value['GEONAME']} ({value['GEOCODE']})", "value": value['GEOCODE']} for i, value in community_districts_geodf.iterrows()]
+
+
+#@app.callback(
+#    Output('cd-demographics', 'style'),
+#    Input('cd-dropdown', 'value'))
+def hide_cd_demo(cd):
+    """Hides the cd demographics graph if no cd is selected.
+
+    Args:
+        cd (str): The community district number.
+
+    Returns:
+        dict: A dictionary containing the style of the graph.
+    """
+    if cd is None:
+        return {'display': 'none'}
+    
+
+
+#@app.callback(
+#    Output('cd-demographics', 'figure'),
+#    Input('cd-dropdown', 'value'))
+def update_cd_demo(cd):
+    if cd is None:
+        cd = 201
+    print("selected cd: ", cd)
+    filtered_df = demo_ages_cd[demo_ages_cd["cd_number"] == cd]
+    fig = px.bar(
+        filtered_df
+        #.drop(columns="index")
+        .assign(group=lambda d: d["gender"].astype(str)),
+        y="age_group",
+        x="value",
+        facet_col="gender",
+        facet_col_spacing=0.1,
+        color="gender",
+        color_discrete_sequence=["#472323", "#233147"],
+        labels=data_preprocessing.get_cd_demographic_legend()
+    )
+    fig.update_layout(
+        yaxis2={"side": "right", "matches": None, "showticklabels": False},
+        yaxis={"side": "right", "showticklabels": True, "title": ""},
+        xaxis={"autorange": "reversed", "title": "Population %"},
+        xaxis2={"matches": None, "title": "Population %"},
+        showlegend=False,
+        width=500,
+        bargap=0.50,
+        margin = {'l':0, 'r':0, 'b':0, 't':0},
+        title='Population by Age and Gender'
+    )
+    fig.update_traces(width=0.4)
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+    #fig.update_traces(texttemplate="%{y}", textposition="inside")
+    return fig
+
+
+#@app.callback(
+#    Output('cd-map', 'figure'),
+#    Input('cd-dropdown', 'value'))
+def update_cd_map(selected_cd):
+    if selected_cd is None:
+        center = [40.730610, -73.935242]
+        zoom = 10
+    else:
+        center = community_districts_geodf[community_districts_geodf['GEOCODE']==selected_cd][['Latitude', 'Longitude']].values[0].tolist()
+        zoom = 12
+    fig_cd_map = go.Figure(go.Scattermapbox())
+    fig_cd_map.add_trace(go.Scattermapbox(
+                        lon = community_districts_geodf.Longitude, lat = community_districts_geodf.Latitude,
+                        text=community_districts_geodf['displayname'],
+                        mode='text',
+                    ))
+    fig_cd_map.update_layout(
+        mapbox = {
+                'accesstoken': mapbox_access_token,
+                #'style': "stamen-terrain",
+                'center': { 'lon': center[0], 'lat': center[1]},
+                'zoom': zoom, 
+                'layers': [{
+                    'source': community_districts_geo,
+                    'type': "fill", 'below': "traces", 'color': "green", 'opacity': 0.5
+                    }],
+            },
+            margin = {'l':0, 'r':0, 'b':0, 't':0},
+            height=400,
+        )
+    return fig_cd_map
+
+#@app.callback(
+#    Output('cd-indicators', 'figure'),
+#    Input('cd-dropdown', 'value'))
+def update_cd_indicators(selected_cd):
+    if selected_cd is None:
+        selected_cd = 201
+    print("selected cd: ", selected_cd)
+    filtered_df = cd_indicators[cd_indicators["cd_number"] == selected_cd]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Foreign-Born Population<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of residents are foreign-born</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['pct_foreign_born'].values[0],
+        domain = {'row': 0, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Unemployment<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of unemployed residents</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['unemployment'].values[0],
+        domain = {'row': 0, 'column': 1}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Commute to Work<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>mean in minutes</span>"},
+        mode = "number",
+        number = {'suffix': "min"},
+        value = filtered_df['mean_commute'].values[0],
+        domain = {'row': 3, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "English Proficiency<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% having limited English proficiency</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['lep_rate'].values[0],
+        domain = {'row': 3, 'column': 1}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Poverty Measure<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of incomes below poverty threshold</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['poverty_rate'].values[0],
+        domain = {'row': 6, 'column': 0}))
+
+    fig.add_trace(go.Indicator(
+        title = {"text": "Rent Burden<br><span style='font-size:0.6em;color:gray;line-height: 0.8;'>% of households spend 35%<br>or more of their income on rent</span>"},
+        mode = "number",
+        number = {'suffix': "%"},
+        value = filtered_df['pct_hh_rent_burd'].values[0],
+        domain = {'row': 6, 'column': 1}))
+
+    fig.update_layout(
+        grid = {'rows': 7, 'columns': 2, 'pattern': "independent"},
+        template = {'data' : {'indicator': [{
+            'title': {'text': "Speed"},
+            'mode' : "number+delta+gauge",
+            'delta' : {'reference': 90}}]
+                            }},    
+        )
+    return fig
+
+
 
 # Generate drawer content based on selected datasets
 @app.callback(
@@ -1038,38 +1039,38 @@ app.layout = dbc.Container([
             ], shadow="xl", p='xs', radius='md'
         ),
         html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
-        dmc.Paper(
-            children=[
-            dbc.Row([
-                dbc.Col([
-                    html.Br(),
-                    html.Label('Category'),
-                    dcc.Dropdown(dropdown_options_cd,
-                                id='cd-dropdown'
-                                ), #style={'padding': 10, 'flex': 1}  
-                ], width=4),
-            ]),
-            dbc.Row([
-                dbc.Col([
-                    dcc.Graph(
-                        id='cd-map',
-                        figure=fig_cd_map
-                    ),
+        # dmc.Paper(
+        #     children=[
+        #     dbc.Row([
+        #         dbc.Col([
+        #             html.Br(),
+        #             html.Label('Category'),
+        #             dcc.Dropdown(dropdown_options_cd,
+        #                         id='cd-dropdown'
+        #                         ), #style={'padding': 10, 'flex': 1}  
+        #         ], width=4),
+        #     ]),
+        #     dbc.Row([
+        #         dbc.Col([
+        #             dcc.Graph(
+        #                 id='cd-map',
+        #                 figure=fig_cd_map
+        #             ),
                     
-                ], width=3),
-                dbc.Col([
-                    dcc.Graph(
-                        id='cd-demographics',
-                    ),
-                ], width=4),
-                dbc.Col([
-                    dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
-                        mode = "number",
-                        value = 0,))),
-                ], width=5),
-            ]),
-            ], shadow="xl", p='xs', radius='md'
-        ),
+        #         ], width=3),
+        #         dbc.Col([
+        #             dcc.Graph(
+        #                 id='cd-demographics',
+        #             ),
+        #         ], width=4),
+        #         dbc.Col([
+        #             dcc.Graph(id="cd-indicators", figure=go.Figure().add_trace(go.Indicator(
+        #                 mode = "number",
+        #                 value = 0,))),
+        #         ], width=5),
+        #     ]),
+        #     ], shadow="xl", p='xs', radius='md'
+        # ),
         html.Hr(style={'marginBottom': 50, 'color': 'rgba(0, 0, 0, 0)'}),
     ],fluid=True,),
 ], class_name="main-container",fluid=True,)

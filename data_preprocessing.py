@@ -209,9 +209,9 @@ def get_community_districts_geodata():
 
 def get_community_districts_geodf():
     gdf = gpd.read_file('data/reference_data/UHF42.geo.json')
-    gdf = gdf.to_crs('epsg:4326')
-    gdf['Longitude'] = gdf['geometry'].to_crs('epsg:4087').centroid.x
-    gdf['Latitude'] = gdf['geometry'].to_crs('epsg:4087').centroid.y
+    #gdf = gdf.to_crs('epsg:4326')
+    gdf['Longitude'] = gdf['geometry'].centroid.x
+    gdf['Latitude'] = gdf['geometry'].centroid.y
     gdf['displayname'] = [f'{a} <br> {b}' for a, b in zip(gdf["GEOCODE"], gdf["GEONAME"])]
     return gdf
 
