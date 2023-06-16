@@ -1,3 +1,10 @@
+"""
+__author__ = "Ole Bause, Alexander Barkov"
+__version__ = "1.0.0"
+
+server configuration, data loading, and the layout of the application.
+It also loads the callbacks that are responsible for the interactivity.
+"""
 import os
 import copy
 import time
@@ -64,6 +71,7 @@ attributes = {
     "shootings": {'OCCUR_DATE': 'Date', 'OCCUR_TIME': 'Time', 'BORO': 'Borough', 'LOC_OF_OCCUR_DESC': 'Location', 'PRECINCT': 'Precinct', 'STATISTICAL_MURDER_FLAG': 'Murdered', 'PERP_AGE_GROUP': 'Offender Age Group', 'PERP_SEX': 'Offender Sex', 'PERP_RACE': 'Offender Ethnicity', 'PERP_AGE_GROUP': 'Offender Age', 'VIC_SEX': 'Victim Sex', 'VIC_RACE': 'Victim Ethnicity'},
     "squirrels": {'Age': 'Age', 'Primary Fur Color': 'Primary Fur Color', 'Highlight Fur Color': 'Highlight Fur Color', 'Location': 'Location', 'Running': 'Running', 'Chasing': 'Chasing', 'Climbing': 'Climbing', 'Eating': 'Eating', 'Foraging': 'Foraging', 'Other Activities': 'Other Activities', 'Kuks': 'Kuks', 'Quaas': 'Quaas', 'Moans': 'Moans', 'Tail flags': 'Tail flags', 'Tail twitches': 'Tail twitches', 'Approaches': 'Approaches', 'Runs from': 'Runs from', 'Other Interactions': 'Other Interactions'},
     "arrests": {'OFNS_DESC': 'Description', 'ARREST_PRECINCT': 'Precinct', 'AGE_GROUP': 'Age Group', 'PERP_SEX': 'Sex', 'PERP_RACE': 'Ethnicity', 'year': 'Year', 'month': 'Month', 'day': 'Day'},
+    "car_accidents": {"CRASH DATE": "Crash date", "CRASH TIME": "Crash time", "BOROUGH": "Borough", "ON STREET NAME": "Street", "NUMBER OF PERSONS INJURED": "Persons Injured", "NUMBER OF PERSONS KILLED": "Persons killed", "NUMBER OF PEDESTRIANS INJURED": "Pedestrians injured", "NUMBER OF PEDESTRIANS KILLED": "Pedestrians killed", "NUMBER OF CYCLIST INJURED": "Cyclists injured", "NUMBER OF CYCLIST KILLED": "Cyclists killed", "CONTRIBUTING FACTOR VEHICLE 1": "Accident cause", "VEHICLE TYPE CODE 1": "Vecicle 1 type", "VEHICLE TYPE CODE 2": "Vehicle 2 type"},
     "schools": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
     "fireservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
     "policeservices": {'facname': 'Name','facgroup': 'Group','facsubgrp': 'Sub-Group', 'factype': 'Type'},
@@ -331,6 +339,15 @@ fig_radar_bar = go.Figure(go.Bar())
     Input('map-category', 'value'),
     State('map-filter', 'value'))
 def set_filter_options(selected_category, selected_filters):
+    """This callback generates the filter options based on the selected category and the active filters.
+
+    Args:
+        selected_category (str): The value of the category dropdown element.
+        selected_filters (list): The list of selected filters.
+
+    Returns:
+        list: All filter options for the selected category.
+    """
     app.logger.debug("Selected category: ", selected_category)
     
     options = []
@@ -378,6 +395,14 @@ def set_filter_options(selected_category, selected_filters):
     Output('map', 'figure'),
     Input('map-filter', 'value'))
 def update_map(filter_values):
+    """Updates the map based on the selected filters and their visualization type.
+
+    Args:
+        filter_values (list): List of selected filters.
+
+    Returns:
+        figure: Map figure.
+    """
     app.logger.debug("Selected Filters: {}".format(filter_values))
     
     layers = []
@@ -473,11 +498,20 @@ def update_map(filter_values):
     State('map-filter', 'value')
     )
 def display_click_data(clickData, state):
+    """Displays the data of the selected point in the map.
+
+    Args:
+        clickData (dict): A dictionary containing information about the clicked point.
+        state (list): A list of selected filters.
+
+    Returns:
+        str: A html table containing the data of the selected point. 
+    """
     #print("clickData: ", clickData)
     #print("state: ", state)
     
     if clickData is None:
-        return "nothing selected"
+        return "Click on a point to see its data"
     
     curve_number = clickData['points'][0]['curveNumber']
     point_number = clickData['points'][0]['pointNumber']
@@ -506,6 +540,14 @@ def display_click_data(clickData, state):
     Output('cd-demographics', 'style'),
     Input('cd-dropdown', 'value'))
 def hide_cd_demo(cd):
+    """Hides the cd demographics graph if no cd is selected.
+
+    Args:
+        cd (str): The community district number.
+
+    Returns:
+        dict: A dictionary containing the style of the graph.
+    """
     if cd is None:
         return {'display': 'none'}
     
@@ -650,6 +692,11 @@ def update_cd_indicators(selected_cd):
     Input("dropdown", "value")
 )
 def update_line_chart(selected_year):
+    """Updates the line chart based on the selected year.
+
+    Returns:
+        figure: The line chart.
+    """
     df = df_timeline
     
     fig = go.Figure()
@@ -696,6 +743,14 @@ def update_line_chart(selected_year):
     Input("slider", "value")
 )
 def update_stacked(selected_year):
+    """Updates the bar chart based on the selected year.
+
+    Args:
+        selected_year (int): The selected year.
+
+    Returns:
+        figure: The bar chart.
+    """
     df_2022 = df_stacked_2022
     df_2018 = df_stacked_2018
     df_2015 = df_stacked_2015
@@ -721,6 +776,14 @@ def update_stacked(selected_year):
     Input("slider", "value")
 )
 def update_radar(selected_year):
+    """Updates the radar chart based on the selected year.
+
+    Args:
+        selected_year (int): THe selected year.
+
+    Returns:
+        figure: The radar chart.
+    """
     df_2022 = df_radar_2022
     df_2018 = df_radar_2018
     df_2015 = df_radar_2015
@@ -783,6 +846,14 @@ dropdown_options_cd = [{"label": f"{value['GEONAME']} ({value['GEOCODE']})", "va
     #prevent_initial_call=True,
 )
 def drawer_data_details(filter_values):
+    """Generates the drawer content based on the selected datasets.
+
+    Args:
+        filter_values (list): The selected datasets.
+    
+    Returns:
+        list: A list of html components.
+    """
     content = []
     if filter_values is None:
         content.append(html.P("No data selected. Please select data from the filter options."))
@@ -806,6 +877,11 @@ def drawer_data_details(filter_values):
     prevent_initial_call=True,
 )
 def open_drawer(n_clicks):
+    """Opens the drawer when the button is clicked.
+
+    Returns:
+        bool: True if the drawer is opened, False otherwise.
+    """
     return True
 
 # App layout
@@ -883,7 +959,7 @@ app.layout = dbc.Container([
             dbc.Col([
                 html.H3("Detailed Information"),
                 dmc.Button("Show dataset details", id="data-details-button"),
-                html.H6("Click on any data point to show detailed information about this point"),
+                #html.H6("Click on any data point to show detailed information about this point"),
                 html.Div(id='map-click-data'),
                 dmc.Drawer(
                     title="Data Details",

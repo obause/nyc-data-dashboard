@@ -1,3 +1,7 @@
+"""
+This module contains functions for data loading and preprocessing.
+"""
+
 import pandas as pd
 import json
 import geopandas as gpd
@@ -5,9 +9,7 @@ from shapely.geometry import shape
 from shapely import wkt
 
 import plotly.express as px
-#import chart_studio.plotly as py
 import plotly.graph_objects as go
-#from plotly.offline import init_notebook_mode, iplot, plot
 
 class Data:
     def __init__(self, filepath, format, description=None):
@@ -90,26 +92,16 @@ def get_air_quality_data(measure_name='All', time_period='All'):
     air_quality = pd.read_csv("data/social/NYCgov_Air_Quality.csv")
     if measure_name != 'All':   
         air_quality = air_quality[air_quality['Name'] == measure_name]
-    #nyc_cd = pd.read_csv("data/reference_data/nycd.csv")
     if time_period != 'All':
         air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42') & (air_quality['Time Period'] == time_period)]
     else:
         air_quality = air_quality[(air_quality['Geo Type Name'] == 'UHF42')]
-    #pd_by_cm = pd.merge(air_quality, nyc_cd, left_on='Geo Join ID', right_on='BoroCD')
-    #nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
-    #gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
-    #gdf.drop('the_geom', axis=1, inplace=True)
-    #multipolygon_json = json.loads(gdf.to_json())
-    #gdf = gdf.set_index('BoroCD')
     
     return air_quality
     
 def get_cd_demographic_data():
     demo_ages = pd.read_csv("data/social/cd_demographic_age_gender.csv")
 
-    #demo_ages_test = demo_ages[demo_ages['cd_number'] == 201]
-    #demo_ages_female = demo_ages_test.iloc[:, 7:25]
-    #demo_ages_male = demo_ages_test.iloc[:, 25:]
     demo_ages = demo_ages.iloc[:, 1:-4]
     demo_ages = demo_ages.drop(columns=demo_ages.iloc[:, 1:6])
     demo_ages_pivot = demo_ages.melt(id_vars=['cd_number'], var_name='age_group', value_name='value')
@@ -206,7 +198,7 @@ def get_nypd_precincts_geodata():
     return nypd_precincts_geo
 
 def get_park_geodata():
-    with open('data/Parks_Properties.geojson') as f:
+    with open('data/environment/Parks_Properties.geojson') as f:
         nyc_parks_geo = json.load(f)
     return nyc_parks_geo
 
@@ -216,12 +208,7 @@ def get_community_districts_geodata():
     return nyc_uhf42_geo
 
 def get_community_districts_geodf():
-    #nyc_cd = pd.read_csv("../data/reference_data/nycd.csv")
-    #nyc_cd['geometry'] = nyc_cd['the_geom'].apply(wkt.loads)
-    #gdf = gpd.GeoDataFrame(nyc_cd, crs='epsg:4326')
-    #gdf.drop('the_geom', axis=1, inplace=True)
     gdf = gpd.read_file('data/reference_data/UHF42.geo.json')
-    #gdf = gdf.set_index('BoroCD')
     gdf = gdf.to_crs('epsg:4326')
     gdf['Longitude'] = gdf['geometry'].to_crs('epsg:4087').centroid.x
     gdf['Latitude'] = gdf['geometry'].to_crs('epsg:4087').centroid.y
@@ -229,21 +216,21 @@ def get_community_districts_geodf():
     return gdf
 
 def get_borough_geodata():
-    with open("data/Borough_Boundaries.geojson") as f:
+    with open("data/environment/Borough_Boundaries.geojson") as f:
         nyc_borough_geo = json.load(f)
     return nyc_borough_geo
 
 def get_measures_radar():
     df_measures_2022 = pd.read_excel(
-       io='data/measures_2022.xlsx',
+       io='data/other/measures_2022.xlsx',
        sheet_name ='CHP_all_data'
     )
     df_measures_2018 = pd.read_excel(
-       io='data/measures_2018.xlsx',
+       io='data/other/measures_2018.xlsx',
        sheet_name ='CHP_all_data'
     )
     df_measures_2015 = pd.read_excel(
-       io='data/measures_2015.xlsx',
+       io='data/other/measures_2015.xlsx',
        sheet_name ='CHP_all_data'
     )
 
@@ -270,15 +257,15 @@ def get_measures_radar():
 
 def get_measures_stacked():
     df_measures_2022 = pd.read_excel(
-       io='data/measures_2022.xlsx',
+       io='data/other/measures_2022.xlsx',
        sheet_name ='CHP_all_data'
     )
     df_measures_2018 = pd.read_excel(
-       io='data/measures_2018.xlsx',
+       io='data/other/measures_2018.xlsx',
        sheet_name ='CHP_all_data'
     )
     df_measures_2015 = pd.read_excel(
-       io='data/measures_2015.xlsx',
+       io='data/other/measures_2015.xlsx',
        sheet_name ='CHP_all_data'
     )
     
@@ -304,16 +291,16 @@ def get_measures_stacked():
     return df_stacked_2022, df_stacked_2018, df_stacked_2015
 
 def get_timeline():
-    df_timeline = pd.read_csv('data/medianAskingRent_grouped.csv', sep=';')
+    df_timeline = pd.read_csv('data/other/medianAskingRent_grouped.csv', sep=';')
     return df_timeline
 
 def get_school_loc():
-    df_school_loc = pd.read_csv('data/school_locations_2019_2020.csv')
+    df_school_loc = pd.read_csv('data/environment/school_locations_2019_2020.csv')
     df_school_loc.rename(columns={"LONGITUDE": "Longitude", "LATITUDE": "Latitude"}, inplace=True)
     return df_school_loc
 
 def load_facility_dataset():
-    df_fac = pd.read_csv('data/facilities.csv')
+    df_fac = pd.read_csv('data/environment/facilities.csv')
     df_fac = df_fac[["facname","latitude","longitude","facgroup","facsubgrp","factype"]]
     df_fac.rename(columns={"longitude": "Longitude", "latitude": "Latitude"}, inplace=True)
     return df_fac
@@ -327,12 +314,12 @@ def get_facilities(df, facgroup = None, facsubgrp = None):
     return df
 
 def get_parking_geodata():
-    with open('data/Parking.geojson') as f:
+    with open('data/environment/Parking.geojson') as f:
         nypd_parking_geo = json.load(f)
     return nypd_parking_geo
 
 def get_hurricane_geodata():
-    with open('data/Hurricane_Evac_Zones.geojson') as f:
+    with open('data/environment/Hurricane_Evac_Zones.geojson') as f:
         nypd_hurricane_geo = json.load(f)
     return nypd_hurricane_geo
 
