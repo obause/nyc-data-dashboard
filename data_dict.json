@@ -12,8 +12,8 @@
     },
     "arrests": {
         "marker_style": {
-            "size": 6,
-            "color": "rgb(0, 255, 0)",
+            "size": 4,
+            "color": "orange",
             "opacity": 1
         },
         "text": "Arrest",
@@ -22,8 +22,8 @@
     },
     "car_accidents": {
         "marker_style": {
-            "size": 6,
-            "color": "black",
+            "size": 2,
+            "color": "grey",
             "opacity": 1
         },
         "text": "Car Accident",
