@@ -37,6 +37,7 @@ mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3Vwcm
 
 # Initialization of the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) #dbc.themes.CYBORG
+server = app.server
 app.logger.info("-------------------------------------------")
 app.logger.info("App initialized")
 
