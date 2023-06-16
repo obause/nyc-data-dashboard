@@ -1,4 +1,4 @@
-
+# New York Smart City Dashboard
 This repository hosts an interactive visualization application that makes use of various datasets available on the [New York Open Data Portal](https://opendata.cityofnewyork.us/). Developed in Python, it leverages libraries such as Plotly, Dash, Pandas, and GeoPandas for data loading, preprocessing, and visualization.
 
 The application provides a powerful and intuitive interface to explore a wealth of information on New York City in an interactive manner. It incorporates Polygon and MultiPolygon data in GeoJSON format for geographical visualization. A key feature of this application is its use of interactive controls, allowing users to adjust visualization parameters on the fly for a more tailored analysis experience.
