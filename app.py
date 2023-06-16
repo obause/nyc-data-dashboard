@@ -4,12 +4,9 @@ import time
 import datetime
 import json
 import logging
-#import dash
 
 from dash import Dash, dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
-#from dash_bootstrap_templates import load_figure_template
-#load_figure_template('LUX')
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
@@ -49,7 +46,8 @@ map_categories = [
     'Education and Youth', 
     'Libraries and Cultural Programs', 
     'Health and Human Services', 
-    'Transportation']
+    'Transportation'
+]
 
 # Load metadata
 try:
@@ -90,7 +88,7 @@ attributes = {
 app.logger.info("Loading and preprocessing data...")
 data_loading_start = time.time()
 
-# Data loading and preprocessing
+######## Data loading and preprocessing ########
 borough_mapping = data_preprocessing.get_borough_mappings()
 
 nyc_parks_geo = data_preprocessing.get_park_geodata()
@@ -250,7 +248,7 @@ app.logger.info('Successfully loaded {} datasets'.format(number_of_datasets))
 
 mapbox_access_token = 'pk.eyJ1Ijoib2JhdXNlIiwiYSI6ImNsZ3lydDJkajBjYnQzaHFjd3VwcmdoZ3oifQ.yHMnUntRqbBXwCmezGo10w'
 
-# Base initialization of figures
+######## Base initialization of figures ########
 fig_map = go.Figure(go.Scattermapbox())
 
 fig_map.update_layout(
@@ -326,7 +324,7 @@ fig_radar_bar = go.Figure(go.Bar())
 
 ############# Callbacks #############
 
-# Generate Filter Options
+# Generate Filter Options based on category selected and active filters
 @app.callback(
     Output('map-filter', 'children'),
     Input('map-category', 'value'),
@@ -372,11 +370,9 @@ def set_filter_options(selected_category, selected_filters):
                         variant="outline"
                         )
                     )
-
-
     return options
 
-
+# Update Map based on selected filters and their visualization type
 @app.callback(
     Output('map', 'figure'),
     Input('map-filter', 'value'))
@@ -469,6 +465,7 @@ def update_map(filter_values):
     return fig_map
 
 
+# Display data of selected point in map
 @app.callback(
     Output('map-click-data', 'children'),
     Input('map', 'clickData'),
@@ -646,6 +643,7 @@ def update_cd_indicators(selected_cd):
     return fig
 
 
+# Update the line chart based on dropdown selection
 @app.callback(
     Output("graph", "figure"),
     Input("dropdown", "value")
@@ -691,6 +689,7 @@ def update_line_chart(selected_year):
     )  
     return fig
 
+# Update the bar chart based on slider selection
 @app.callback(
     Output("stacked", "figure"),
     Input("slider", "value")
@@ -715,7 +714,7 @@ def update_stacked(selected_year):
     )
     return fig
 
-
+# Update the radar chart based on slider selection
 @app.callback(
     Output("radar", "figure"),
     Input("slider", "value")
@@ -774,9 +773,9 @@ def update_radar(selected_year):
     )
     return fig
 
-
 dropdown_options_cd = [{"label": f"{value['GEONAME']} ({value['GEOCODE']})", "value": value['GEOCODE']} for i, value in community_districts_geodf.iterrows()]
 
+# Generate drawer content based on selected datasets
 @app.callback(
     Output("drawer-data-details", "children"),
     Input("map-filter", "value"),
@@ -799,6 +798,7 @@ def drawer_data_details(filter_values):
             ]
     return content
 
+# Open drawer when button is clicked
 @app.callback(
     Output("drawer-data-details", "opened"),
     Input("data-details-button", "n_clicks"),
@@ -1004,4 +1004,4 @@ if __name__ == '__main__':
     app.logger.info("Starting NYC Smart City Dashboard app")
     
     app.logger.info("Starting Dash server")
-    app.run_server(debug=False, processes=1, threaded=False)
+    app.run_server(debug=False, processes=1, threaded=True)
